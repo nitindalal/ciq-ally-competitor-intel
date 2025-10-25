@@ -52,6 +52,8 @@ def normalize_recs(recs):
             else:
                 section = "unknown"
 
+        if section:
+            section = str(section).strip().lower()
         item = {
             "section": section,
             "title": _get_attr(r, "title", default=section.title() if section else "Suggestion"),

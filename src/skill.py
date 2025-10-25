@@ -50,6 +50,8 @@ def _normalize_recs(recs):
             elif "bullet" in t: section = "bullets"
             elif "description" in t: section = "description"
             else: section = "unknown"
+        if section:
+            section = str(section).strip().lower()
         out.append({
             "section": section,
             "title": _get_attr(r, "title", default=section.title() if section else "Suggestion"),

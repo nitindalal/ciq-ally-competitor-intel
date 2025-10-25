@@ -52,6 +52,8 @@ def normalize_recs(recs):
         before = _get_attr(r, "before", default=None)
         after  = _get_attr(r, "after",  default=None)
 
+        if section:
+            section = str(section).strip().lower()
         norm.append({
             "section": section,
             "title": _get_attr(r, "title", default=section.title() if section else "Suggestion"),
