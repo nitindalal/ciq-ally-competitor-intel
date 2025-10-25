@@ -1,0 +1,5 @@
+policy_id: pet-supplies_ae_2018
+market: AE
+categories: ["PetSupplies"]
+version: "2018-12"
+source_file: "source.pdf"

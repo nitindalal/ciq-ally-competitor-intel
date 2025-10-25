@@ -1,0 +1,13 @@
+python-dotenv
+pandas
+tiktoken
+openai>=1.0.0
+textstat
+regex
+fastapi
+uvicorn
+streamlit
+pydantic
+google-generativeai
+pyyaml
+pymupdf

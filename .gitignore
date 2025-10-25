@@ -1,0 +1,26 @@
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# environments
+.venv/
+env/
+venv/
+.env
+.env.example
+
+# OS
+.DS_Store
+
+# editor
+.vscode/
+.idea/
+
+# runtime outputs
+*.log
+*.tmp
+
+# privacy / evaluation artifacts
+report.md
