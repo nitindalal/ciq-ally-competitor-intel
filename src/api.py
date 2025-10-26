@@ -6,7 +6,11 @@ from typing import Any, Dict, List, Optional, Union
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from .skill import run_compare
+from .skill import run_compare, _coerce_list
+from .loaders import load_csv, select_skus
+from .preprocess import preprocess
+from .rules_registry import load_all_rules, select_rules
+from .rules_engine import validate_with_rules
 
 # ---------- Pydantic DTOs ----------
 
@@ -70,6 +74,37 @@ class CompareResponse(BaseModel):
     comparison: List[ComparisonRowDTO]
     client: SKUDetailsDTO
     competitor: SKUDetailsDTO
+
+
+class DraftPayload(BaseModel):
+    title: str
+    bullets: List[str]
+    description: str
+
+
+class ValidateRequest(BaseModel):
+    client_id: str
+    market: str = "AE"
+    csv_path: str = "data/asin_data_filled.csv"
+    draft: DraftPayload
+
+
+class ValidateResponse(BaseModel):
+    passed: bool
+    findings: List[FindingDTO]
+
+
+class FinalizeRequest(BaseModel):
+    client_id: str
+    market: str = "AE"
+    csv_path: str = "data/asin_data_filled.csv"
+    draft: DraftPayload
+
+
+class FinalizeResponse(BaseModel):
+    final_markdown: str
+    draft: DraftDTO
+    findings: List[FindingDTO] = []
 
 
 # ---------- Serialization helpers ----------
@@ -186,3 +221,77 @@ def compare(req: CompareRequest) -> CompareResponse:
         competitor=_serialize_sku(result.get("competitor")),
     )
     return response
+
+
+@app.post("/validate", response_model=ValidateResponse)
+def validate(req: ValidateRequest) -> ValidateResponse:
+    client = _load_client(req.client_id, req.csv_path)
+    draft = _sanitize_draft(req.draft)
+
+    client.title = draft.title
+    client.bullets = draft.bullets
+    client.description = draft.description
+
+    rules = _load_rules(req.market)
+    findings = validate_with_rules(client, rules)
+    serialized = [_serialize_finding(f) for f in findings]
+    passed = all(f.passed for f in findings)
+    return ValidateResponse(passed=passed, findings=serialized)
+
+
+@app.post("/finalize", response_model=FinalizeResponse)
+def finalize(req: FinalizeRequest) -> FinalizeResponse:
+    client = _load_client(req.client_id, req.csv_path)
+    draft = _sanitize_draft(req.draft)
+
+    client.title = draft.title
+    client.bullets = draft.bullets
+    client.description = draft.description
+
+    rules = _load_rules(req.market)
+    findings = validate_with_rules(client, rules)
+    serialized = [_serialize_finding(f) for f in findings]
+
+    final_markdown = _render_final_markdown(client.sku_id, draft)
+    return FinalizeResponse(final_markdown=final_markdown, draft=draft, findings=serialized)
+
+
+def _load_client(client_id: str, csv_path: str):
+    df = load_csv(csv_path)
+    client_row, _ = select_skus(df, client_id, client_id)
+    return preprocess(client_row)
+
+
+def _load_rules(market: str):
+    packs = load_all_rules("data/policies")
+    return select_rules(packs, market=market, categories=[])
+
+
+def _sanitize_draft(draft: DraftPayload) -> DraftDTO:
+    title = (draft.title or "").strip()
+    bullets = _coerce_list(draft.bullets)
+    description = (draft.description or "").strip()
+    return DraftDTO(title=title, bullets=bullets, description=description)
+
+
+def _render_final_markdown(sku_id: str, draft: DraftDTO) -> str:
+    lines = [
+        f"# FINAL – {sku_id}",
+        "",
+        "## Title",
+        draft.title or "(empty)",
+        "",
+        "## Bullets",
+    ]
+    if draft.bullets:
+        lines.extend(f"- {bullet}" for bullet in draft.bullets)
+    else:
+        lines.append("(none)")
+    lines.extend(
+        [
+            "",
+            "## Description",
+            draft.description or "(empty)",
+        ]
+    )
+    return "\n".join(lines)

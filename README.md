@@ -40,26 +40,84 @@ python3 -m src.policy_llm_extract --pdf data/policies/pet-supplies_ae_2018/sourc
 uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 # test: http://localhost:8000/docs
 ```
+- `POST /compare` → full pipeline (report + draft + suggestions)
+- `POST /validate` → re-check a draft `{client_id, draft{title,bullets,description}}` against policy
+- `POST /finalize` → return final markdown plus validation findings for the supplied draft
 
 ### Wire Into a Custom GPT (Optional)
 1. **Deploy the API** somewhere reachable over HTTPS (same FastAPI app above; Render/Fly/Railway works).
-2. In ChatGPT → *Explore GPTs* → *Create*, open the **Actions** tab and add a new action:
-   - Endpoint: `POST https://<your-host>/compare`
-   - Request schema:  
-     ```json
-     {
-       "type": "object",
-       "required": ["client_id", "competitor_id"],
-       "properties": {
-         "client_id": {"type": "string"},
-         "competitor_id": {"type": "string"},
-         "market": {"type": "string", "default": "AE"},
-         "csv_path": {"type": "string", "default": "data/asin_data_filled.csv"}
+2. In ChatGPT → *Explore GPTs* → *Create*, add the action(s) using a snippet like:
+   ```json
+   {
+     "openapi": "3.1.0",
+     "info": { "title": "CIQ Ally API", "version": "1.0.0" },
+     "servers": [{ "url": "https://<your-host>" }],
+     "paths": {
+       "/compare": {
+         "post": {
+           "operationId": "compareSkus",
+           "summary": "Compare client and competitor SKUs",
+           "requestBody": {
+             "required": true,
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "type": "object",
+                   "required": ["client_id", "competitor_id"],
+                   "properties": {
+                     "client_id": { "type": "string" },
+                     "competitor_id": { "type": "string" },
+                     "market": { "type": "string", "default": "AE" },
+                     "csv_path": { "type": "string", "default": "data/asin_data_filled.csv" }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       },
+       "/validate": {
+         "post": {
+           "operationId": "validateDraft",
+           "summary": "Validate an edited draft",
+           "requestBody": {
+             "required": true,
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "type": "object",
+                   "required": ["client_id", "draft"],
+                   "properties": {
+                     "client_id": { "type": "string" },
+                     "market": { "type": "string", "default": "AE" },
+                     "csv_path": { "type": "string", "default": "data/asin_data_filled.csv" },
+                     "draft": {
+                       "type": "object",
+                       "properties": {
+                         "title": { "type": "string" },
+                         "bullets": { "type": "array", "items": { "type": "string" } },
+                         "description": { "type": "string" }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       },
+       "/finalize": {
+         "post": {
+           "operationId": "finalizeDraft",
+           "summary": "Render final markdown",
+           "requestBody": { "$ref": "#/paths/~1validate/post/requestBody" }
+         }
        }
      }
-     ```
-   - Response example: copy a sample payload from `http://localhost:8000/docs`.
-3. In the GPT instructions, tell it when to call the action (e.g., “When given two SKU IDs, call `compare` and summarize the report/draft.”).
+   }
+   ```
+3. Response examples: copy the JSON produced by each endpoint from `http://localhost:8000/docs`.
+4. In the GPT instructions, outline the flow (call `compare` with two SKUs, update the draft in-chat, call `validate` when asked, and call `finalize` once the user approves).
 
 ## Folder layout
 ```
