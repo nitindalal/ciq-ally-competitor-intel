@@ -225,11 +225,17 @@ def compare(req: CompareRequest) -> CompareResponse:
     }
     suggestions = [_serialize_suggestion(s) for s in result.get("suggestions", [])]
 
-    report_markdown = result.get("report_markdown", "") if req.include_report else ""
-    draft_payload = DraftDTO(**result.get("draft", {})) if req.include_draft else DraftDTO(title="", bullets=[], description="")
-    suggestions_payload = suggestions if req.include_suggestions else []
-    findings_payload = findings if req.include_findings else {"client": [], "competitor": []}
-    comparison_payload = [_serialize_comparison(row) for row in result.get("comparison", [])] if req.include_comparison else []
+    include_report = getattr(req, "include_report", True)
+    include_draft = getattr(req, "include_draft", True)
+    include_suggestions = getattr(req, "include_suggestions", True)
+    include_findings = getattr(req, "include_findings", True)
+    include_comparison = getattr(req, "include_comparison", True)
+
+    report_markdown = result.get("report_markdown", "") if include_report else ""
+    draft_payload = DraftDTO(**result.get("draft", {})) if include_draft else DraftDTO(title="", bullets=[], description="")
+    suggestions_payload = suggestions if include_suggestions else []
+    findings_payload = findings if include_findings else {"client": [], "competitor": []}
+    comparison_payload = [_serialize_comparison(row) for row in result.get("comparison", [])] if include_comparison else []
 
     response = CompareResponse(
         report_markdown=report_markdown,
