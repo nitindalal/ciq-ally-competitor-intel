@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIQ Ally — Competitor Content Intelligence</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --muted: #cbd5f5;
+        }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg), #020617);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .slide {
+            max-width: 1024px;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 28px;
+            padding: 3.5rem;
+            box-shadow: 0 32px 80px rgba(2, 6, 23, 0.45);
+            backdrop-filter: blur(18px);
+        }
+        h1 {
+            margin: 0 0 1rem;
+            font-size: clamp(2.4rem, 5vw, 3.4rem);
+            letter-spacing: 0.04em;
+        }
+        h1 span {
+            color: var(--accent);
+        }
+        .tagline {
+            font-size: clamp(1rem, 2.4vw, 1.35rem);
+            color: var(--muted);
+            margin-bottom: 2.5rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.75rem;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.92);
+            border-radius: 18px;
+            padding: 1.5rem;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.04);
+        }
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .card p {
+            margin: 0;
+            line-height: 1.55;
+            font-size: 0.97rem;
+            color: var(--muted);
+        }
+        .footer {
+            margin-top: 2.75rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.92rem;
+            color: rgba(226, 232, 240, 0.65);
+        }
+        .footer strong {
+            color: var(--accent);
+        }
+        @media (max-width: 720px) {
+            body {
+                padding: 1.5rem;
+            }
+            .slide {
+                padding: 2.5rem;
+            }
+            .footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="slide">
+        <h1><span>CIQ Ally</span> — Competitor Content Intelligence</h1>
+        <p class="tagline">Rapidly contrasts client vs. competitor Amazon listings, surfaces compliant edits, and carries them through approval, finalization, and delivery.</p>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Goal</h2>
+                <p>Deliver an Ally skill that compares a client SKU against a competitor, aligns with Amazon policy, and outputs ready-to-send recommendations + final copy.</p>
+            </article>
+            <article class="card">
+                <h2>User</h2>
+                <p>CommerceIQ Customer Success & retail content managers who need fast, defensible guidance to keep listings compliant and competitive.</p>
+            </article>
+            <article class="card">
+                <h2>Problem</h2>
+                <p>Manual cross-checking rules, competitor copy, and final approvals is slow, inconsistent, and error-prone—especially across markets and categories.</p>
+            </article>
+            <article class="card">
+                <h2>Approach</h2>
+                <p>Blend deterministic policy validation, heuristic fallbacks, and LLM suggestions; expose CLI + Streamlit + API; add eval harness and Custom GPT actions.</p>
+            </article>
+            <article class="card">
+                <h2>Solution</h2>
+                <p>End-to-end pipeline (load → preprocess → compare → recommend → approve → finalize → email) with optional eval suite and on-demand reporting.</p>
+            </article>
+            <article class="card">
+                <h2>Next Steps</h2>
+                <p>Expand policy extraction coverage, add more eval cases, capture session history for GPT workflows, and layer in analytics on recommendation adoption.</p>
+            </article>
+        </section>
+
+        <footer class="footer">
+            <span><strong>Tech:</strong> FastAPI, Streamlit, Gemini, Mailjet, Render</span>
+            <span><strong>Demo:</strong> /compare → /validate → /finalize → /email → /eval</span>
+        </footer>
+    </main>
+</body>
+</html>

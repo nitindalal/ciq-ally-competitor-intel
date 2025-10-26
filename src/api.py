@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import asdict, is_dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 import httpx
 import markdown2
@@ -15,6 +17,8 @@ from .preprocess import preprocess
 from .rules_registry import load_all_rules, select_rules
 from .rules_engine import validate_with_rules
 from eval.run_eval import CASES_DIR as EVAL_CASES_DIR, _load_case as eval_load_case, _evaluate_case as eval_evaluate_case, _print_debug as eval_print_debug
+
+SLIDE_PATH = Path(__file__).resolve().parents[1] / "static" / "demo_slide.html"
 
 # ---------- Pydantic DTOs ----------
 
@@ -226,6 +230,13 @@ app = FastAPI(
     version="1.0.0",
     description="LLM-assisted SKU comparison service that powers the CIQ Ally demo.",
 )
+
+
+@app.get("/demo-slide", response_class=HTMLResponse)
+def demo_slide() -> HTMLResponse:
+    if not SLIDE_PATH.exists():
+        raise HTTPException(status_code=404, detail="Slide not found.")
+    return HTMLResponse(SLIDE_PATH.read_text(encoding="utf-8"))
 
 
 @app.post("/compare", response_model=CompareResponse)

@@ -47,6 +47,7 @@ uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 - `POST /finalize` → return final markdown plus validation findings for the supplied draft
 - `POST /email` → send markdown via Mailjet (`MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `MAILJET_FROM_EMAIL`, optional `MAILJET_FROM_NAME`)
 - `POST /eval` → run regression cases (`case` optional to target one; `verbose` returns debug payloads)
+- `GET /demo-slide` → hosted overview slide for demo & context
 
 ### Wire Into a Custom GPT (Optional)
 1. **Deploy the API** somewhere reachable over HTTPS (same FastAPI app above; Render/Fly/Railway works).
