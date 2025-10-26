@@ -14,6 +14,7 @@ from .loaders import load_csv, select_skus
 from .preprocess import preprocess
 from .rules_registry import load_all_rules, select_rules
 from .rules_engine import validate_with_rules
+from eval.run_eval import CASES_DIR as EVAL_CASES_DIR, _load_case as eval_load_case, _evaluate_case as eval_evaluate_case, _print_debug as eval_print_debug
 
 # ---------- Pydantic DTOs ----------
 
@@ -319,6 +320,29 @@ async def send_email(req: EmailRequest) -> EmailResponse:
     return EmailResponse(status="sent")
 
 
+@app.post("/eval", response_model=EvalResponse)
+def run_eval(req: EvalRequest) -> EvalResponse:
+    case_paths = sorted(EVAL_CASES_DIR.glob("*.json"))
+    if req.case:
+        match = [p for p in case_paths if p.stem == req.case]
+        if not match:
+            raise HTTPException(status_code=404, detail=f"Case '{req.case}' not found.")
+        case_paths = match
+
+    results: List[EvalCaseResult] = []
+    overall_pass = True
+
+    for path in case_paths:
+        case = eval_load_case(path)
+        errors, info = eval_evaluate_case(case)
+        passed = not errors
+        overall_pass = overall_pass and passed
+        payload = info if req.verbose else {}
+        results.append(EvalCaseResult(name=case["name"], passed=passed, errors=errors, info=payload))
+
+    return EvalResponse(overall_pass=overall_pass, results=results)
+
+
 def _load_client(client_id: str, csv_path: str):
     df = load_csv(csv_path)
     client_row, _ = select_skus(df, client_id, client_id)
@@ -374,3 +398,18 @@ def _mailjet_config() -> Optional[Dict[str, Any]]:
         "from_email": from_email,
         "from_name": from_name,
     }
+class EvalRequest(BaseModel):
+    case: Optional[str] = Field(default=None, description="Optional case name to run (without .json). Run all cases if omitted.")
+    verbose: bool = Field(default=False, description="Include debug information for each case.")
+
+
+class EvalCaseResult(BaseModel):
+    name: str
+    passed: bool
+    errors: List[str] = []
+    info: Dict[str, Any] = {}
+
+
+class EvalResponse(BaseModel):
+    overall_pass: bool
+    results: List[EvalCaseResult]

@@ -40,10 +40,12 @@ python3 -m src.policy_llm_extract --pdf data/policies/pet-supplies_ae_2018/sourc
 uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 # test: http://localhost:8000/docs
 ```
-- `POST /compare` → full pipeline (report + draft + suggestions)
+- `POST /compare` → full pipeline (report + draft + suggestions)  
+  optional flags: `include_report`, `include_comparison`, `include_findings`, `include_suggestions`, `include_draft`
 - `POST /validate` → re-check a draft `{client_id, draft{title,bullets,description}}` against policy
 - `POST /finalize` → return final markdown plus validation findings for the supplied draft
 - `POST /email` → send markdown via Mailjet (`MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `MAILJET_FROM_EMAIL`, optional `MAILJET_FROM_NAME`)
+- `POST /eval` → run regression cases (`case` optional to target one; `verbose` returns debug payloads)
 
 ### Wire Into a Custom GPT (Optional)
 1. **Deploy the API** somewhere reachable over HTTPS (same FastAPI app above; Render/Fly/Railway works).
@@ -113,12 +115,55 @@ uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
            "summary": "Render final markdown",
            "requestBody": { "$ref": "#/paths/~1validate/post/requestBody" }
          }
+       },
+       "/email": {
+         "post": {
+           "operationId": "sendEmail",
+           "summary": "Email the finalized draft",
+           "requestBody": {
+             "required": true,
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "type": "object",
+                   "required": ["to_email", "body_markdown"],
+                   "properties": {
+                     "to_email": { "type": "string", "format": "email" },
+                     "subject": { "type": "string", "default": "CIQ Ally Draft" },
+                     "from_email": { "type": "string", "format": "email" },
+                     "body_markdown": { "type": "string" }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       },
+       "/eval": {
+         "post": {
+           "operationId": "runEvalSuite",
+           "summary": "Execute regression checks",
+           "requestBody": {
+             "required": false,
+             "content": {
+               "application/json": {
+                 "schema": {
+                   "type": "object",
+                   "properties": {
+                     "case": { "type": "string", "description": "Optional case name (e.g., overlong_title)" },
+                     "verbose": { "type": "boolean", "default": false }
+                   }
+                 }
+               }
+             }
+           }
+         }
        }
      }
    }
    ```
 3. Response examples: copy the JSON produced by each endpoint from `http://localhost:8000/docs`.
-4. In the GPT instructions, outline the flow (call `compare` with two SKUs, update the draft in-chat, call `validate` when asked, and call `finalize` once the user approves).
+4. In the GPT instructions, outline the flow (call `compare` with two SKUs, update the draft in-chat, `validate` when asked, `finalize` once the user approves, `sendEmail` when given an address, and `runEvalSuite` on demand to show regression status).
 
 ## Folder layout
 ```
