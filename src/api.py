@@ -1,53 +1,169 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import List, Optional
-from .loaders import load_csv, select_skus
-from .preprocess import preprocess
-from .rules import validate_all
-from .scoring import score_all
-from .compare import compare_sections
-from .recommender import suggest_edits_llm
-from .approvals import ask_approval
+from __future__ import annotations
 
-app = FastAPI(title='CIQ Ally — Competitor Content Intelligence API')
+from typing import Any, Dict, List, Optional, Union
 
-STYLEGUIDE_REFS = [
-    'Titles: concise; avoid ALL CAPS/promo/seller info【9†PetSupplies_PetFood_Styleguide_EN_AE._CB1198675309_.pdf†L96-L116】',
-    'Bullets: up to 5; start with capital; no ending punctuation; be specific【9†...†L162-L212】',
-    'Descriptions: concise, truthful; no promo/URLs【9†...†L214-L274】'
-]
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+
+from .skill import run_compare
+
+# ---------- Pydantic DTOs ----------
+
+ContentField = Union[str, List[str]]
+
 
 class CompareRequest(BaseModel):
-    csv_path: str
-    client_id: str
-    competitor_id: str
+    client_id: str = Field(..., description="Client SKU identifier.")
+    competitor_id: str = Field(..., description="Competitor SKU identifier.")
+    market: str = Field(default="AE", description="Market code to filter policy packs.")
+    csv_path: str = Field(default="data/asin_data_filled.csv", description="Path to the catalog CSV.")
 
-class RecommendationDTO(BaseModel):
+
+class DraftDTO(BaseModel):
     title: str
-    before: str
-    after: str
-    rationale: str
-    references: List[str]
+    bullets: List[str]
+    description: str
 
-@app.post('/compare')
-def compare(req: CompareRequest):
-    df = load_csv(req.csv_path)
-    client, competitor = select_skus(df, req.client_id, req.competitor_id)
 
-    client_p, comp_p = preprocess(client), preprocess(competitor)
-    client_find, comp_find = validate_all(client_p), validate_all(comp_p)
-    client_scores, comp_scores = score_all(client_p), score_all(comp_p)
-    comparison = compare_sections(client_p, comp_p, client_scores, comp_scores, client_find, comp_find)
-    recs = suggest_edits_llm(client_p, comp_p, comparison, STYLEGUIDE_REFS)
-    approved = ask_approval(recs)
+class SuggestionDTO(BaseModel):
+    section: str
+    title: str
+    before: Optional[ContentField] = None
+    after: Optional[ContentField] = None
+    rationale: str = ""
+    references: List[str] = []
 
-    comp_rows = [r.__dict__ for r in comparison]
-    rec_rows = [RecommendationDTO(**r.__dict__).dict() for r in recs]
 
-    return {
-        'client': client_p.__dict__,
-        'competitor': comp_p.__dict__,
-        'comparison': comp_rows,
-        'recommendations': rec_rows,
-        'approved': approved
+class FindingDTO(BaseModel):
+    section: str
+    rule_id: str
+    passed: bool
+    message: str
+    citation: Optional[str] = None
+    severity: Optional[str] = None
+
+
+class ComparisonRowDTO(BaseModel):
+    section: str
+    metric: str
+    client: Union[str, float, int]
+    competitor: Union[str, float, int]
+    gap: Union[str, float, int]
+    compliance_notes: List[str] = []
+
+
+class SKUDetailsDTO(BaseModel):
+    sku_id: str
+    title: str
+    bullets: List[str]
+    description: str
+    brand: Optional[str] = None
+    category: Optional[str] = None
+
+
+class CompareResponse(BaseModel):
+    report_markdown: str
+    draft: DraftDTO
+    suggestions: List[SuggestionDTO]
+    findings: Dict[str, List[FindingDTO]]
+    comparison: List[ComparisonRowDTO]
+    client: SKUDetailsDTO
+    competitor: SKUDetailsDTO
+
+
+# ---------- Serialization helpers ----------
+
+def _serialize_finding(finding: Any) -> FindingDTO:
+    data = getattr(finding, "__dict__", dict(finding))
+    severity = getattr(finding, "severity", None)
+    payload = {
+        "section": data.get("section"),
+        "rule_id": data.get("rule_id"),
+        "passed": data.get("passed"),
+        "message": data.get("message"),
+        "citation": data.get("citation"),
+        "severity": severity,
     }
+    return FindingDTO(**payload)
+
+
+def _serialize_comparison(row: Any) -> ComparisonRowDTO:
+    data = getattr(row, "__dict__", dict(row))
+    return ComparisonRowDTO(
+        section=data.get("section"),
+        metric=data.get("metric"),
+        client=data.get("client"),
+        competitor=data.get("competitor"),
+        gap=data.get("gap"),
+        compliance_notes=data.get("compliance_notes") or [],
+    )
+
+
+def _serialize_sku(sku: Any) -> SKUDetailsDTO:
+    data = getattr(sku, "__dict__", dict(sku))
+    return SKUDetailsDTO(
+        sku_id=data.get("sku_id", ""),
+        title=data.get("title", ""),
+        bullets=list(data.get("bullets") or []),
+        description=data.get("description", ""),
+        brand=data.get("brand"),
+        category=data.get("category"),
+    )
+
+
+def _serialize_suggestion(s: Dict[str, Any]) -> SuggestionDTO:
+    # Ensure lists instead of None
+    references = s.get("references") or []
+    return SuggestionDTO(
+        section=s.get("section", "unknown"),
+        title=s.get("title", "Suggestion"),
+        before=s.get("before"),
+        after=s.get("after"),
+        rationale=s.get("rationale", ""),
+        references=references,
+    )
+
+
+def _serialize_findings_bucket(findings: List[Any]) -> List[FindingDTO]:
+    return [_serialize_finding(f) for f in findings]
+
+
+# ---------- FastAPI application ----------
+
+app = FastAPI(
+    title="CIQ Ally — Competitor Content Intelligence API",
+    version="1.0.0",
+    description="LLM-assisted SKU comparison service that powers the CIQ Ally demo.",
+)
+
+
+@app.post("/compare", response_model=CompareResponse)
+def compare(req: CompareRequest) -> CompareResponse:
+    try:
+        result = run_compare(
+            client_id=req.client_id,
+            competitor_id=req.competitor_id,
+            csv_path=req.csv_path,
+            market=req.market,
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:  # pragma: no cover - bubble unexpected errors
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    findings = {
+        "client": _serialize_findings_bucket(result.get("findings", {}).get("client", [])),
+        "competitor": _serialize_findings_bucket(result.get("findings", {}).get("competitor", [])),
+    }
+    suggestions = [_serialize_suggestion(s) for s in result.get("suggestions", [])]
+
+    response = CompareResponse(
+        report_markdown=result.get("report_markdown", ""),
+        draft=DraftDTO(**result.get("draft", {})),
+        suggestions=suggestions,
+        findings=findings,
+        comparison=[_serialize_comparison(row) for row in result.get("comparison", [])],
+        client=_serialize_sku(result.get("client")),
+        competitor=_serialize_sku(result.get("competitor")),
+    )
+    return response
