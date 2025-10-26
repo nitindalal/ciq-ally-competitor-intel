@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import asdict, is_dataclass
 from typing import Any, Dict, List, Optional, Union
 
 from fastapi import FastAPI, HTTPException
@@ -74,8 +75,14 @@ class CompareResponse(BaseModel):
 # ---------- Serialization helpers ----------
 
 def _serialize_finding(finding: Any) -> FindingDTO:
-    data = getattr(finding, "__dict__", dict(finding))
-    severity = getattr(finding, "severity", None)
+    if is_dataclass(finding):
+        data = asdict(finding)
+    elif hasattr(finding, "__dict__"):
+        data = finding.__dict__
+    else:
+        data = dict(finding)
+
+    severity = getattr(finding, "severity", data.get("severity"))
     payload = {
         "section": data.get("section"),
         "rule_id": data.get("rule_id"),
