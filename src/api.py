@@ -75,16 +75,7 @@ class CompareResponse(BaseModel):
 # ---------- Serialization helpers ----------
 
 def _serialize_finding(finding: Any) -> FindingDTO:
-    if is_dataclass(finding):
-        data = asdict(finding)
-    elif hasattr(finding, "__dict__"):
-        data = finding.__dict__
-    else:
-        try:
-            data = dict(finding)
-        except TypeError:
-            raise TypeError(f"Unsupported finding type: {type(finding)!r}")
-
+    data = _coerce_to_dict(finding)
     severity = getattr(finding, "severity", data.get("severity"))
     payload = {
         "section": data.get("section"),
@@ -98,15 +89,7 @@ def _serialize_finding(finding: Any) -> FindingDTO:
 
 
 def _serialize_comparison(row: Any) -> ComparisonRowDTO:
-    if is_dataclass(row):
-        data = asdict(row)
-    elif hasattr(row, "__dict__"):
-        data = row.__dict__
-    else:
-        try:
-            data = dict(row)
-        except TypeError:
-            raise TypeError(f"Unsupported comparison row type: {type(row)!r}")
+    data = _coerce_to_dict(row)
     return ComparisonRowDTO(
         section=data.get("section"),
         metric=data.get("metric"),
@@ -118,15 +101,7 @@ def _serialize_comparison(row: Any) -> ComparisonRowDTO:
 
 
 def _serialize_sku(sku: Any) -> SKUDetailsDTO:
-    if is_dataclass(sku):
-        data = asdict(sku)
-    elif hasattr(sku, "__dict__"):
-        data = sku.__dict__
-    else:
-        try:
-            data = dict(sku)
-        except TypeError:
-            raise TypeError(f"Unsupported SKU type: {type(sku)!r}")
+    data = _coerce_to_dict(sku)
     return SKUDetailsDTO(
         sku_id=data.get("sku_id", ""),
         title=data.get("title", ""),
@@ -152,6 +127,24 @@ def _serialize_suggestion(s: Dict[str, Any]) -> SuggestionDTO:
 
 def _serialize_findings_bucket(findings: List[Any]) -> List[FindingDTO]:
     return [_serialize_finding(f) for f in findings]
+
+
+def _coerce_to_dict(obj: Any) -> Dict[str, Any]:
+    if obj is None:
+        return {}
+    if is_dataclass(obj):
+        return asdict(obj)
+    if hasattr(obj, "__dict__"):
+        return obj.__dict__
+    if hasattr(obj, "_asdict"):
+        return obj._asdict()  # type: ignore[attr-defined]
+    try:
+        return dict(obj)
+    except TypeError:
+        try:
+            return vars(obj)
+        except TypeError:
+            return {}
 
 
 # ---------- FastAPI application ----------
