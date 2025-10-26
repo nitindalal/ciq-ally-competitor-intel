@@ -31,7 +31,13 @@ def _coerce_list(x):
     if x is None:
         return []
     if isinstance(x, list):
-        return [b.strip() for b in x if str(b).strip()]
+        cleaned = []
+        for item in x:
+            text = str(item).strip()
+            text = text.lstrip("-• \t")
+            if text:
+                cleaned.append(text)
+        return cleaned
     if isinstance(x, str):
         parts = [p.strip("-• \t") for p in x.split("\n")]
         return [p for p in parts if p]

@@ -37,31 +37,48 @@ def _rx(pattern: str, flags: str = "") -> re.Pattern:
 # ---- Check implementations
 def check_max_length(value: Any, params: Dict[str, Any]) -> bool:
     if not isinstance(value, str): return True
+    if "value" not in params:
+        return True
     return len(value) <= int(params["value"])
 
 def check_min_length(value: Any, params: Dict[str, Any]) -> bool:
     if not isinstance(value, str): return True
+    if "value" not in params:
+        return True
     return len(value) >= int(params["value"])
 
 def check_max_count(value: Any, params: Dict[str, Any]) -> bool:
     if not isinstance(value, list): return True
+    if "value" not in params:
+        return True
     return len(value) <= int(params["value"])
 
 def check_min_count(value: Any, params: Dict[str, Any]) -> bool:
     if not isinstance(value, list): return True
+    if "value" not in params:
+        return True
     return len(value) >= int(params["value"])
 
 def check_forbidden_regex(value: Any, params: Dict[str, Any]) -> bool:
     if not isinstance(value, str): return True
-    return _rx(params["pattern"], params.get("flags","")).search(value) is None
+    pattern = params.get("pattern")
+    if not pattern:
+        return True
+    return _rx(pattern, params.get("flags","")).search(value) is None
 
 def check_required_regex(value: Any, params: Dict[str, Any]) -> bool:
     if not isinstance(value, str): return True
-    return _rx(params["pattern"], params.get("flags","")).search(value) is not None
+    pattern = params.get("pattern")
+    if not pattern:
+        return True
+    return _rx(pattern, params.get("flags","")).search(value) is not None
 
 def check_forbidden_regex_each(value: Any, params: Dict[str, Any]) -> bool:
     if not isinstance(value, list): return True
-    r = _rx(params["pattern"], params.get("flags",""))
+    pattern = params.get("pattern")
+    if not pattern:
+        return True
+    r = _rx(pattern, params.get("flags",""))
     return all(r.search((v or "")) is None for v in value)
 
 def check_no_ending_punct(value: Any, params: Dict[str, Any]) -> bool:

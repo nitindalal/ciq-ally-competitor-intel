@@ -1,0 +1,400 @@
+{
+  "title": {
+    "prompt": "Policy section: **Title**\n\n```\nwhen searching online. They also give important information to browsing customers, increasing the\nchances they will click on (and purchase) one of your items.\nThis guide refers specifically to best practices for listing products in the Pet Supplies category. For more\ngeneral best-practice guidance, please refer to the Product Listing & Content Guide that covers Computers\n& Office, Home, Garden & Pets, Toys & Baby, DIY, Tools, Auto, Grocery and Health & Beauty products.\nProduct Listing & Content Guide\nUAE Pet Supplies & Pet Food. Updated Dec 2018\nYour product title is the first thing customers see when visiting your detail page. Does your title\nprovide the customer with the right information? Will they continue looking at your product offering?\nAmazon.ae uses the words in product titles to display products in search results. A concise and\nrelevant title will drive traffic to your product. Always check titles for consistent format and accuracy.\nFollow the guidelines below to create product titles that make a good first impression.\nDo\nDo Not\nCapitalise the first letter of each word\n(exceptions apply, see right)\nUse numerals (2 instead of two)\nIf a bundled product, state value in parenthesis\nas (pack of X)\nKeep it short, but include critical information\n50 characters maximum\nNote: Please include only standard text.\nType 1 High ASCII characters (\u00ae, \u00a9, \u2122, etc.) or other\nspecial characters are not supported.\nDo not include price and quantity\nDo not use ALL CAPS\nDo not capitalise:\no\nConjunctions (and, or, for)\no\nArticles (the, a, an)\no\nPrepositions with fewer than five letters\n(in, on, over, with, etc.)\nDo not include seller information\nDo not include promotional messages such as\n\"sale\" or \"free shipping/delivery\" (use the\nPromotion Manager tool to include messaging)\nDo not use your seller name for Brand or\nManufacturer information, unless your product is\nPrivate Label\nDo not include symbols in your listings (such as: !\n* $ ?)\nDo not include subjective commentary such as\n\u201cHot Item\u201d or \u201cBest Seller\u201d\nElements to Include:\n[Brand] + [sub-brand (if applicable] + [product type] + [style] + [quantity/size (if applicable)]\nExamples:\nBrand\nProduct Type\nStyle\nQuantity/Size\nLittermaid\nCarbon Filters\nReplacements\n12 Pack\nYap Peluchi\nPet Bed\nGiraffe Oval\n22 inch\nFURminator\ndeShedding Tool\nYellow with 4-Inch Edge\nLarge\nNote:  Including your company information or sale messaging in your product titles may negatively impact your\nseller account.\n```\n\nIdentify every enforceable content rule described in this section and output them using the required JSON schema.\n",
+    "response": "[\n  {\n    \"id\": \"title-max-length\",\n    \"section\": \"title\",\n    \"type\": \"max_length\",\n    \"params\": {\n      \"value\": 50\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product title must not exceed 50 characters.\",\n    \"citation\": \"50 characters maximum\"\n  },\n  {\n    \"id\": \"title-forbidden-symbols\",\n    \"section\": \"title\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"[\u00ae\u00a9\u2122!*$?]\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product title must not contain special characters such as \u00ae, \u00a9, \u2122, !, *, $, or ?. Include only standard text.\",\n    \"citation\": \"Note: Please include only standard text...; Do not include symbols...\"\n  },\n  {\n    \"id\": \"title-forbidden-all-caps\",\n    \"section\": \"title\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"\\\\b[A-Z]{2,}\\\\b\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product title must not use ALL CAPS for words.\",\n    \"citation\": \"Do not use ALL CAPS\"\n  },\n  {\n    \"id\": \"title-forbidden-capitalized-small-words\",\n    \"section\": \"title\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"\\\\b(And|Or|For|The|A|An|In|On|Over|With)\\\\b\"\n    },\n    \"severity\": \"warning\",\n    \"message\": \"Specific small words (conjunctions, articles, short prepositions) must not be capitalized in the title.\",\n    \"citation\": \"Do not capitalise:\"\n  },\n  {\n    \"id\": \"title-forbidden-spelled-out-numbers\",\n    \"section\": \"title\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"\\\\b(one|two|three|four|five|six|seven|eight|nine|ten)\\\\b\"\n    },\n    \"severity\": \"warning\",\n    \"message\": \"Numbers should be represented as numerals (e.g., 2 instead of two).\",\n    \"citation\": \"Use numerals (2 instead of two)\"\n  },\n  {\n    \"id\": \"title-forbidden-price\",\n    \"section\": \"title\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"(\\\\$|\u00a3|\u20ac|\u00a5|\\\\b(USD|GBP|EUR|CAD|AUD)\\\\b)\\\\s*\\\\d+(\\\\.\\\\d{1,2})?\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product title must not include price information.\",\n    \"citation\": \"Do not include price and quantity\"\n  },\n  {\n    \"id\": \"title-forbidden-promotional\",\n    \"section\": \"title\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"\\\\b(sale|free shipping|free delivery|discount|promo|deal|offer)\\\\b\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product title must not include promotional messages.\",\n    \"citation\": \"Do not include promotional messages\"\n  },\n  {\n    \"id\": \"title-forbidden-subjective\",\n    \"section\": \"title\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"\\\\b(Hot Item|Best Seller|Amazing|Great Value|New Arrival|Limited Edition)\\\\b\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product title must not include subjective commentary.\",\n    \"citation\": \"Do not include subjective commentary\"\n  }\n]",
+    "parsed": [
+      {
+        "id": "title-max-length",
+        "section": "title",
+        "type": "max_length",
+        "params": {
+          "value": 50
+        },
+        "severity": "error",
+        "message": "Product title must not exceed 50 characters.",
+        "citation": "50 characters maximum"
+      },
+      {
+        "id": "title-forbidden-symbols",
+        "section": "title",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "[\u00ae\u00a9\u2122!*$?]"
+        },
+        "severity": "error",
+        "message": "Product title must not contain special characters such as \u00ae, \u00a9, \u2122, !, *, $, or ?. Include only standard text.",
+        "citation": "Note: Please include only standard text...; Do not include symbols..."
+      },
+      {
+        "id": "title-forbidden-all-caps",
+        "section": "title",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "\\b[A-Z]{2,}\\b"
+        },
+        "severity": "error",
+        "message": "Product title must not use ALL CAPS for words.",
+        "citation": "Do not use ALL CAPS"
+      },
+      {
+        "id": "title-forbidden-capitalized-small-words",
+        "section": "title",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "\\b(And|Or|For|The|A|An|In|On|Over|With)\\b"
+        },
+        "severity": "warning",
+        "message": "Specific small words (conjunctions, articles, short prepositions) must not be capitalized in the title.",
+        "citation": "Do not capitalise:"
+      },
+      {
+        "id": "title-forbidden-spelled-out-numbers",
+        "section": "title",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "\\b(one|two|three|four|five|six|seven|eight|nine|ten)\\b"
+        },
+        "severity": "warning",
+        "message": "Numbers should be represented as numerals (e.g., 2 instead of two).",
+        "citation": "Use numerals (2 instead of two)"
+      },
+      {
+        "id": "title-forbidden-price",
+        "section": "title",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "(\\$|\u00a3|\u20ac|\u00a5|\\b(USD|GBP|EUR|CAD|AUD)\\b)\\s*\\d+(\\.\\d{1,2})?"
+        },
+        "severity": "error",
+        "message": "Product title must not include price information.",
+        "citation": "Do not include price and quantity"
+      },
+      {
+        "id": "title-forbidden-promotional",
+        "section": "title",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "\\b(sale|free shipping|free delivery|discount|promo|deal|offer)\\b"
+        },
+        "severity": "error",
+        "message": "Product title must not include promotional messages.",
+        "citation": "Do not include promotional messages"
+      },
+      {
+        "id": "title-forbidden-subjective",
+        "section": "title",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "\\b(Hot Item|Best Seller|Amazing|Great Value|New Arrival|Limited Edition)\\b"
+        },
+        "severity": "error",
+        "message": "Product title must not include subjective commentary.",
+        "citation": "Do not include subjective commentary"
+      }
+    ]
+  },
+  "images": {
+    "prompt": "Policy section: **Images**\n\n```\nFor this product category, good product pictures play a crucial role during the purchase decision, since\ncustomers cannot touch or try on the products. The ideal way is to use pictures with high resolution,\nso that Zoom functionality can be used. In addition several pictures with different angles are\nrecommended. Good pictures not only contribute more sales, but can also reduce customer returns.\nImages display on the product search page and the product detail page. A professional image helps\ncustomers discover your product and can drive traffic to your product listings. Show customers exactly\nwhat they will receive in their order (and only what they will receive). Make it easy for them to identify\nyour product with a clear, high-quality image displaying exactly what you're offering.\nRequired\nUse simple and clean white backgrounds that do\nnot distract from the product\nCreate images with 500-pixels minimum; 1,000-\npixels images are preferred\nShow the entire product. The product should\noccupy at least 80 percent of the image area.\nInclude only what the customer will be receiving;\naccessories that are not part of the product\nshould not be shown\nIf it is a bundled product, it is not necessary to\nshow the entire LOT, a single image of the\nproduct will suffice\nImages must be in JPEG file formats. Encoding\nmust be RGB encoding, CMYK is not supported.\nRule of thumb: if you cannot view the image\nwith an Internet browser such as Firefox, but can\nopen and edit the image with e.g. Adobe\nPhotoshop, the image\u2019s encoding is very likely to\nbe CMYK.\nProhibited\nBorders, watermarks, text, or other decorations\nColoured backgrounds or lifestyle pictures\nOther products, items or accessories that are not\npart of the product listing; only include exactly\nwhat the customer is buying\nImage place holders (e.g. \u201ctemporary images\u201d or\n\u201cno image available\u201d)\nImages containing graphs of product ratings\nPromotional text such as \"sale\" or \"free ship\"\n(use the Manage Promotions tool instead)\nNote: Zoom Functionality\nWhen you submit an image of at least 1,000 dpi, customers can zoom in on your product image on the\ndetail page. This provides a detailed look at your product and may reduce returns and negative\nfeedback.\nNote: Alternative images such as close-ups or lifestyle shots must also follow the above requirements though\nlifestyle images are acceptable. We highly encourage you to submit additional views of your product.\nNot allowed:\n\uf0a7\nErotic images\n\uf0a7\nDrawings\n\uf0a7\nAnimated images\nIf your product is part of a variation (e.g. an envelope that comes in different sizes), please ensure that the\nparent sku gets assigned with an image as well. Further information and examples can be found in the Pet\nSupplies template.\nExamples of good images:\nBad images (which will be removed from site and may result in a suspension of your\nSellerCentral account):\n```\n\nIdentify every enforceable content rule described in this section and output them using the required JSON schema.\n",
+    "response": "[\n  {\n    \"id\": \"image_background_white\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"non_white_background|lifestyle_background\",\n      \"field\": \"image_background\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must have a simple and clean white background; colored or lifestyle backgrounds are prohibited.\",\n    \"citation\": \"Required / Prohibited\"\n  },\n  {\n    \"id\": \"image_min_resolution\",\n    \"section\": \"images\",\n    \"type\": \"min_length\",\n    \"params\": {\n      \"dimension\": \"width_or_height\",\n      \"value\": 500\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must have a minimum resolution of 500 pixels (width or height).\",\n    \"citation\": \"Required\"\n  },\n  {\n    \"id\": \"image_preferred_resolution\",\n    \"section\": \"images\",\n    \"type\": \"min_length\",\n    \"params\": {\n      \"dimension\": \"width_or_height\",\n      \"value\": 1000\n    },\n    \"severity\": \"info\",\n    \"message\": \"Images are preferred to have a minimum resolution of 1000 pixels (width or height) to enable zoom functionality.\",\n    \"citation\": \"Required / Note: Zoom Functionality\"\n  },\n  {\n    \"id\": \"image_no_extra_items\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"items_not_part_of_listing\",\n      \"field\": \"image_content\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must only include items the customer will receive; accessories not part of the product should not be shown.\",\n    \"citation\": \"Required / Prohibited\"\n  },\n  {\n    \"id\": \"image_format_jpeg\",\n    \"section\": \"images\",\n    \"type\": \"required_regex\",\n    \"params\": {\n      \"regex\": \"\\\\.jpe?g$\",\n      \"field\": \"file_extension\",\n      \"case_sensitive\": false\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must be in JPEG file format.\",\n    \"citation\": \"Required\"\n  },\n  {\n    \"id\": \"image_encoding_rgb\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"CMYK\",\n      \"field\": \"image_encoding\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must use RGB encoding; CMYK is not supported.\",\n    \"citation\": \"Required\"\n  },\n  {\n    \"id\": \"image_no_decorations\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"border|watermark|text|decoration\",\n      \"field\": \"image_content\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must not contain borders, watermarks, text, or other decorations.\",\n    \"citation\": \"Prohibited\"\n  },\n  {\n    \"id\": \"image_no_placeholders\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"temporary images|no image available\",\n      \"field\": \"image_content\",\n      \"case_sensitive\": false\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must not be placeholders (e.g., 'temporary images' or 'no image available').\",\n    \"citation\": \"Prohibited\"\n  },\n  {\n    \"id\": \"image_no_rating_graphs\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"product_rating_graph\",\n      \"field\": \"image_content\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must not contain graphs of product ratings.\",\n    \"citation\": \"Prohibited\"\n  },\n  {\n    \"id\": \"image_no_promo_text\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"sale|free ship\",\n      \"field\": \"image_content\",\n      \"case_sensitive\": false\n    },\n    \"severity\": \"error\",\n    \"message\": \"Images must not contain promotional text such as 'sale' or 'free ship'.\",\n    \"citation\": \"Prohibited\"\n  },\n  {\n    \"id\": \"image_no_erotic\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"erotic_content\",\n      \"field\": \"image_content\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Erotic images are not allowed.\",\n    \"citation\": \"Not allowed\"\n  },\n  {\n    \"id\": \"image_no_drawings\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"drawing_style_content\",\n      \"field\": \"image_content\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Drawings are not allowed.\",\n    \"citation\": \"Not allowed\"\n  },\n  {\n    \"id\": \"image_no_animated\",\n    \"section\": \"images\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"regex\": \"gif|apng|webp\",\n      \"field\": \"file_format\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Animated images are not allowed.\",\n    \"citation\": \"Not allowed\"\n  },\n  {\n    \"id\": \"image_parent_sku_required\",\n    \"section\": \"images\",\n    \"type\": \"min_count\",\n    \"params\": {\n      \"value\": 1,\n      \"context_field\": \"sku_type\",\n      \"context_value\": \"parent\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Parent SKUs for variation products must have an assigned image.\",\n    \"citation\": \"Variation images\"\n  }\n]",
+    "parsed": [
+      {
+        "id": "image_background_white",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "non_white_background|lifestyle_background",
+          "field": "image_background"
+        },
+        "severity": "error",
+        "message": "Images must have a simple and clean white background; colored or lifestyle backgrounds are prohibited.",
+        "citation": "Required / Prohibited"
+      },
+      {
+        "id": "image_min_resolution",
+        "section": "images",
+        "type": "min_length",
+        "params": {
+          "dimension": "width_or_height",
+          "value": 500
+        },
+        "severity": "error",
+        "message": "Images must have a minimum resolution of 500 pixels (width or height).",
+        "citation": "Required"
+      },
+      {
+        "id": "image_preferred_resolution",
+        "section": "images",
+        "type": "min_length",
+        "params": {
+          "dimension": "width_or_height",
+          "value": 1000
+        },
+        "severity": "info",
+        "message": "Images are preferred to have a minimum resolution of 1000 pixels (width or height) to enable zoom functionality.",
+        "citation": "Required / Note: Zoom Functionality"
+      },
+      {
+        "id": "image_no_extra_items",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "items_not_part_of_listing",
+          "field": "image_content"
+        },
+        "severity": "error",
+        "message": "Images must only include items the customer will receive; accessories not part of the product should not be shown.",
+        "citation": "Required / Prohibited"
+      },
+      {
+        "id": "image_format_jpeg",
+        "section": "images",
+        "type": "required_regex",
+        "params": {
+          "regex": "\\.jpe?g$",
+          "field": "file_extension",
+          "case_sensitive": false
+        },
+        "severity": "error",
+        "message": "Images must be in JPEG file format.",
+        "citation": "Required"
+      },
+      {
+        "id": "image_encoding_rgb",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "CMYK",
+          "field": "image_encoding"
+        },
+        "severity": "error",
+        "message": "Images must use RGB encoding; CMYK is not supported.",
+        "citation": "Required"
+      },
+      {
+        "id": "image_no_decorations",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "border|watermark|text|decoration",
+          "field": "image_content"
+        },
+        "severity": "error",
+        "message": "Images must not contain borders, watermarks, text, or other decorations.",
+        "citation": "Prohibited"
+      },
+      {
+        "id": "image_no_placeholders",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "temporary images|no image available",
+          "field": "image_content",
+          "case_sensitive": false
+        },
+        "severity": "error",
+        "message": "Images must not be placeholders (e.g., 'temporary images' or 'no image available').",
+        "citation": "Prohibited"
+      },
+      {
+        "id": "image_no_rating_graphs",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "product_rating_graph",
+          "field": "image_content"
+        },
+        "severity": "error",
+        "message": "Images must not contain graphs of product ratings.",
+        "citation": "Prohibited"
+      },
+      {
+        "id": "image_no_promo_text",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "sale|free ship",
+          "field": "image_content",
+          "case_sensitive": false
+        },
+        "severity": "error",
+        "message": "Images must not contain promotional text such as 'sale' or 'free ship'.",
+        "citation": "Prohibited"
+      },
+      {
+        "id": "image_no_erotic",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "erotic_content",
+          "field": "image_content"
+        },
+        "severity": "error",
+        "message": "Erotic images are not allowed.",
+        "citation": "Not allowed"
+      },
+      {
+        "id": "image_no_drawings",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "drawing_style_content",
+          "field": "image_content"
+        },
+        "severity": "error",
+        "message": "Drawings are not allowed.",
+        "citation": "Not allowed"
+      },
+      {
+        "id": "image_no_animated",
+        "section": "images",
+        "type": "forbidden_regex",
+        "params": {
+          "regex": "gif|apng|webp",
+          "field": "file_format"
+        },
+        "severity": "error",
+        "message": "Animated images are not allowed.",
+        "citation": "Not allowed"
+      },
+      {
+        "id": "image_parent_sku_required",
+        "section": "images",
+        "type": "min_count",
+        "params": {
+          "value": 1,
+          "context_field": "sku_type",
+          "context_value": "parent"
+        },
+        "severity": "error",
+        "message": "Parent SKUs for variation products must have an assigned image.",
+        "citation": "Variation images"
+      }
+    ]
+  },
+  "bullets": {
+    "prompt": "Policy section: **Bullets**\n\n```\nThe Key Product Features bullets on the detail page give the customer more details about your\nproduct and can influence the customer purchase decision.\nHighlight the five key features you want customers to consider\nMaintain a consistent order. If your first bullet point is country of origin, keep that\nsame order for all your products\nReiterate important information from the title and description\nBegin each bullet point with a capital letter\nWrite with sentence fragments and do not include ending punctuation\nDo not include promotional and pricing information\nDo not include delivery or company information. Amazon policy prohibits including\nseller, company or delivery information\nThe description helps customers evaluate a product, so any non-product-specific\ninformation can distract from a customer\u2019s purchase decision\nCustomers use this section to get a snapshot of the product. They may finalise a purchase decision\nbased on this information alone, or it may interest them enough to then read the full product\ndescription.\nTips to improve readability\nDo:\nWrite all numbers as numerals\nIn bullets with multiple phrases; separate the phrases with semicolons\nSpell out measurements such as inch, feet, and so on\nDo Not:\nUse hyphens, symbols, periods, or exclamation points\nWrite vague statements; be as specific as possible with product features and\nattributes\nEnter company-specific information; this section is for product features only\nContent\nExample: Featured Bullets\nFeatures\nDimensions: 32.5cm x 21cm x 14cm\nFeatures\nEasily cuts the claws of larger breeds of dog and other\nsimilar sized animals\nFeatures\nLuxury faux-fur soft lining\nExamples:\nGood Product Features\nStainless steel\nWire sprung for ease-of-use\nLightweight\nIdeal for use on all animals\nEasily cuts the claws of larger breeds of dog and other similar sized animals\nBad Product Features\nTop seller\nFree delivery within the United Kingdom\nHURRY WHILE SUPPLIES LAST\n```\n\nIdentify every enforceable content rule described in this section and output them using the required JSON schema.\n",
+    "response": "[\n  {\n    \"id\": \"bullets_start_capital\",\n    \"section\": \"bullets\",\n    \"type\": \"required_regex_each\",\n    \"params\": {\n      \"regex\": \"^[A-Z]\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Each bullet point must begin with a capital letter.\",\n    \"citation\": \"Begin each bullet point with a capital letter\"\n  },\n  {\n    \"id\": \"bullets_no_ending_punct\",\n    \"section\": \"bullets\",\n    \"type\": \"no_ending_punct\",\n    \"severity\": \"error\",\n    \"message\": \"Bullet points must not include ending punctuation.\",\n    \"citation\": \"do not include ending punctuation\"\n  },\n  {\n    \"id\": \"bullets_forbidden_promotional\",\n    \"section\": \"bullets\",\n    \"type\": \"forbidden_regex_each\",\n    \"params\": {\n      \"regex\": \"(?i)\\\\b(top seller|hurry while supplies last|promotion|promotional|best seller|bestseller|hot item|deal of the day|limited time|sale|discount)\\\\b\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Bullet points must not contain promotional information.\",\n    \"citation\": \"Do not include promotional and pricing information\"\n  },\n  {\n    \"id\": \"bullets_forbidden_pricing\",\n    \"section\": \"bullets\",\n    \"type\": \"forbidden_regex_each\",\n    \"params\": {\n      \"regex\": \"(?i)\\\\b(free delivery|price|cost|retail|value)\\\\b|[\u20ac\u00a3$]\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Bullet points must not contain pricing information.\",\n    \"citation\": \"Do not include promotional and pricing information\"\n  },\n  {\n    \"id\": \"bullets_forbidden_delivery\",\n    \"section\": \"bullets\",\n    \"type\": \"forbidden_regex_each\",\n    \"params\": {\n      \"regex\": \"(?i)\\\\b(delivery|shipping|shipment|dispatch)\\\\b\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Bullet points must not contain delivery information.\",\n    \"citation\": \"Do not include delivery or company information.\"\n  },\n  {\n    \"id\": \"bullets_forbidden_company_seller\",\n    \"section\": \"bullets\",\n    \"type\": \"forbidden_regex_each\",\n    \"params\": {\n      \"regex\": \"(?i)\\\\b(seller|company|our brand|our store|we offer|we provide)\\\\b\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Bullet points must not contain seller or company-specific information.\",\n    \"citation\": \"Amazon policy prohibits including seller, company or delivery information\"\n  },\n  {\n    \"id\": \"bullets_numbers_as_numerals\",\n    \"section\": \"bullets\",\n    \"type\": \"bullets_numbers_as_numerals\",\n    \"severity\": \"error\",\n    \"message\": \"All numbers in bullet points should be written as numerals (e.g., '5' instead of 'five').\",\n    \"citation\": \"Write all numbers as numerals\"\n  }\n]",
+    "parsed": [
+      {
+        "id": "bullets_start_capital",
+        "section": "bullets",
+        "type": "required_regex_each",
+        "params": {
+          "regex": "^[A-Z]"
+        },
+        "severity": "error",
+        "message": "Each bullet point must begin with a capital letter.",
+        "citation": "Begin each bullet point with a capital letter"
+      },
+      {
+        "id": "bullets_no_ending_punct",
+        "section": "bullets",
+        "type": "no_ending_punct",
+        "severity": "error",
+        "message": "Bullet points must not include ending punctuation.",
+        "citation": "do not include ending punctuation"
+      },
+      {
+        "id": "bullets_forbidden_promotional",
+        "section": "bullets",
+        "type": "forbidden_regex_each",
+        "params": {
+          "regex": "(?i)\\b(top seller|hurry while supplies last|promotion|promotional|best seller|bestseller|hot item|deal of the day|limited time|sale|discount)\\b"
+        },
+        "severity": "error",
+        "message": "Bullet points must not contain promotional information.",
+        "citation": "Do not include promotional and pricing information"
+      },
+      {
+        "id": "bullets_forbidden_pricing",
+        "section": "bullets",
+        "type": "forbidden_regex_each",
+        "params": {
+          "regex": "(?i)\\b(free delivery|price|cost|retail|value)\\b|[\u20ac\u00a3$]"
+        },
+        "severity": "error",
+        "message": "Bullet points must not contain pricing information.",
+        "citation": "Do not include promotional and pricing information"
+      },
+      {
+        "id": "bullets_forbidden_delivery",
+        "section": "bullets",
+        "type": "forbidden_regex_each",
+        "params": {
+          "regex": "(?i)\\b(delivery|shipping|shipment|dispatch)\\b"
+        },
+        "severity": "error",
+        "message": "Bullet points must not contain delivery information.",
+        "citation": "Do not include delivery or company information."
+      },
+      {
+        "id": "bullets_forbidden_company_seller",
+        "section": "bullets",
+        "type": "forbidden_regex_each",
+        "params": {
+          "regex": "(?i)\\b(seller|company|our brand|our store|we offer|we provide)\\b"
+        },
+        "severity": "error",
+        "message": "Bullet points must not contain seller or company-specific information.",
+        "citation": "Amazon policy prohibits including seller, company or delivery information"
+      },
+      {
+        "id": "bullets_numbers_as_numerals",
+        "section": "bullets",
+        "type": "bullets_numbers_as_numerals",
+        "severity": "error",
+        "message": "All numbers in bullet points should be written as numerals (e.g., '5' instead of 'five').",
+        "citation": "Write all numbers as numerals"
+      }
+    ]
+  },
+  "description": {
+    "prompt": "Policy section: **Description**\n\n```\nThe Product Description lists the product\u2019s features, explains what the product is used for, and\nprovides other specific product information. The customer reads the description to learn more about\nthe product than is obvious from the Title, Image, or Key Product Features. Use this opportunity to\nclearly describe the product and differentiate it from other, similar products. Product descriptions are\nlimited to 200 characters.\nDo\nDo Not\nDescribe the major product features\nand list product information including\nsize, used-for and style\nKeep it short, but include critical\ninformation.\nInclude accurate dimensions, care\ninstructions and warranty information\nUse correct grammar and complete\nsentences\nBe sure that product claims are truthful\nand substantiated\nDo not include your seller name, e-mail address,\nwebsite URL, or any company-specific information\nDo not write about anything but the product for sale;\nthis is your opportunity to tell the customer what\nthey are buying\nDo not include promotional language such as \"sale\"\nor \"free shipping/delivery\" (use the Manage\nPromotions tool instead)\nDo not write in capitals; your product description\nshould be written in sentence caps\nGood:\nProtect your garden habitat with the Defenders Mega-Sonic cat repeller.\nThere are 9 million cats in the UK. The mammal society says cats kill around 275 million prey items a\nyear, including 55 million birds. Voles and other small mammals make up much of the remainder.\nThe Sonic Cat Repeller will help protect your garden habitat and encourage wildlife and birds back into\nit. The Sonic Cat Repeller incorporates a sophisticated PIR (Passive Infra Red) detection system, which\nconstantly monitors a fan shaped area of a 98 degrees arc up to a distance of 12 metres. The\nprotected area is over 120sq. meters of unobstructed space. The Sonic Cat Repeller detects animals\nmoving into this area and triggers a burst of continuously variable ultrasound, which sweeps a\nfrequency range of 18,000Hz, 24,000 Hz to repel them. Simultaneously the LED indicator on the front\nof unit signals that it is now activated.\nThe Sonic Cat Repeller is powered by two 9V alkaline batteries. Battery power is conserved by the PIR\ndetection system, which allows the unit to remain on stand-by between activation periods, therefore\nmaximizing battery life.\nThe Push on/off Test Button on the face of the unit will drop the sonic frequency to an audible range.\nThis enables you to check that the unit is functioning properly and to hear the swept frequency. The\nunit is also weather resistant.\nThis high performance mains operated pet clipper features taper control to enable variable cutting\nlengths ranging from 0.8mm to 2.5mm. Also included in the kit are 4 attachment combs, numbers 1 -\n4, 3mm to 13mm, to provide further cutting lengths as well as grooming scissors and comb. This\ncomprehensive kit even comes with an instructional DVD with step by step instructions on how to use,\nmaking it ideal for those new to home grooming.\nDesigned to cope with most pet coat types, the single speed, 10w vibrating motor operates quietly\nand is ideal for noise-sensitive animals. Ideal for home use this clipper weighs just 446g and is\nergonomically designed for easy handling. The Precision Blade is produced from rust resistant, high\ncarbon steel for durability. Alternative blade types, including a course blade for thicker coats and a\nsurgical blade for close clipping are available separately. Blades can be removed by unscrewing from\nthe clipper body and can be re-sharpened or replaced with minimum effort.\nBad:\nCreating Variations\nIn case you want to sell a product that comes in e.g. different colours and/or sizes, you will have to create\na so-called product variation. A product variation always needs to consist of two different elements:\nParent \u2013 The parent product is just a place holder as this is an item which is not for sale. A parent\nitem neither has a bar code nor price or quantity information. However, it does have product\nimages as well as product information such as product description and all product attributes\nassigned to it. The parent item\u2019s product title has to be of a general format, containing no\nvariation-related information such as colour or size (e.g. FURminator Dog De-Shedding Tool)\nChild \u2013 A child item represents the product that you actually want to sell. Each child has its own\nprice, stock levels, images etc. assigned to it. It is of great importance that the child item\u2019s title\ncontains the respective variation attributes such as colour or size that are applicable to this\nproduct (e.g. FURminator Dog De-Shedding Tool, yellow, large). The child item\u2019s title is the\ninformation that the customer will see in their order confirmation. If you don\u2019t add the variation\nattributes (e.g. colour, size) to the child item\u2019s product title, the customer will no longer have\naccess to this information once the order has been placed.\nAs an example, here\u2019s how to build proper product titles for a product variation:\nTitle\nschema\n[Brand/\nManufacturer]\n+\n[Mfr Part No]\n(where\navailable)  +\n[product\ndescription] +\n[product name]\n+\nColor\nvariation\n+[Child\nVariation]\nSize variation\n[Child\nVariation]\nParent*\nsample:\nCompany\nOf\nAnimals\n2563\nFURminator\nDog De-\nShedding Tool\nResult\n= Company Of Animals 2563 FURminator Dog De-Shedding Tool\nChild**\nsample:\nCompany\nOf\nAnimals\n2563\nFURminator\nDog De-\nShedding Tool,\nYellow,\nLarge\nResult\n= Company Of Animals 2563 FURminator Dog De-Shedding Tool, Yellow, Large\n* Parent = Overall title of the product to be displayed on the detail page. A generic product name without reference to size or colour\n** Child = Variations of the Parent, e.g. colours and sizes.\n\uf0a7\nTo stop titles from becoming overly long, please try to only include the features that are\nnecessary to distinguish similar items and insure that it does not exceed 60 characters.\nPlease not that the detail page for each item allows you to list the full features of a product\nin a much more attractive and effective way.\n\uf0a7\nPlease use proper capitalization in the title, description and bullet points (i.e. not all caps or all\nlower case)\nWhen creating parent/child variations please insure they are configured properly. From the example\nbelow we can draw out some specific points:\nThe column parentage declares whether or not a given SKU is the parent or one of the children.\nThe column parent-sku enables the Child to declare the SKU of its Parent.\nThe column relationship-type is only used by the Child and declares what type of variation\nrelationship is being created.\nThe column variation-theme is used to declare what type of variation is being created.\nThe example highlights a variation theme of SizeColor and Flavor, however you can refer to the\nlist of valid values in the flat file template for a comprehensive list of themes. Remember that you\nalso need to populate the corresponding column (Size, Color and Flavor) which then needs to\ncontain the variation data.\nExample: Properly configured Parent/Child Variation of SizeColor\nTemplateType=\nPetSupplies\nSku\nParentage\nParentSku\nRelationship\nType\nVariation\nTheme\nColor\nSize\nfrm-parent\nParent\nSizeColor\nfrm-small\nChild\nfrm-parent\nVariation\nSizeColor\nyellow\nsmall\nfrm-large\nChild\nfrm-parent\nVariation\nSizeColor\nyellow\nlarge\nProduct specifications\nThis section is populated by various attributes in the flat file and as many as possible should be completed\nto ensure the customer has enough information \u2018above the fold\u2019 to make the purchase decision. In\naddition, some attributes must be filled in because of legal requirements.\nSpecifying the product type\nDepending on the item that you want to list, please specify the template\u2019s \u201cproduct_type\u201d\ncolumn and select a value from the list of valid values which can be found in the template.\nThe specification of the product type determines e.g. the selection criteria and the product\nspecification section on the web site.\nProduct type label\nDisplay attribute label\nDetail page label\nExample\nPetSupplies\nPetType1-PetType5\nPet Type\nDogs\nPetSupplies\nBreedRecommendation\nBreed Recommendation\nSchnauzer, Hound, Akita\nPetSupplies\nSpecialFeatures1-\nSpecialFeatures5\nSpecial Features\nWaterproof,Cooling\nPetSupplies\nSpecificUsesForProduct1-\nSpecificUsesForProduct5\nSpecific Uses\nSuitable for young pets\nPetSupplies\nCareInstructions\nCare Instructions\nHand Washable\nPetSupplies\nDirections\nDirections\nDogs should be treated\nevery 3 months and repeat\ndose should be given\nevery 3 days\nPetSupplies\nItemForm\nItem\nCream\nPetSupplies\nMaterialComposition\nMaterial Type\n80% cotton, 20% polyester\nPetSupplies\nFillMaterialType\nMaterial Fill\nThermal polyester fibre\nPetSupplies\nPetLifeStage\nPet Life Stage\nAdult\nPetSupplies\nMaximumAgeRecommendation\nMaximum Age\nRecommendation\n5 years old\nPetSupplies\nMinimumAgeRecommendation\nMinimum Age\nRecommendation\n1 year old\nPetSupplies\nColorMap\nColour\nGreen\nPetSupplies\nSize\nSize\nLarge\nPetSupplies\nFlavor\nFlavour\nChicken\nPetSupplies\nMaximumWeightRecommendat\nion\nMaximum Weight\nRecommendation\n50.8\nPetSupplies\nMinimumWeightRecommendati\non\nMinimum Weight\nRecommendation\n0.5\nPetSupplies\nWeightRecommendationUnitOf\nMeasure\nWeight Recommendation Unit\nof Measure\nKG\nPetSupplies\nMaximumHeightRecommendati\non\nMaximum Height\nRecommendation\n30\nPetSupplies\nMinimumHeightRecommendati\non\nMinimum Height\nRecommendation\n10\nPetSupplies\nHeightRecommendationUnitOf\nMeasure\nHeight Recommendation Unit\nof Measure\nCM\nPetSupplies\nMaximumGirthSize\nMaximum Girth Size\n70\nPetSupplies\nMinimumGirthSize\nMinimum Girth Size\n30\nPetSupplies\nGirthUnitOfMeasure\nGirth Unit of Measure\nCM\nPetSupplies\nMaximumNeckSize\nMaximum Neck Size\n51\nPetSupplies\nMinimumNeckSize\nMinimum Neck Size\n25\nPetSupplies\nNeckSizeUnitOfMeasure\nNeck Size Unit of Measure\nCM\nSearch refinements through \u201eRecommended Browse Nodes\u201c (product classification)\nThis process allows a product to be assigned to a certain product category which has\nbeen defined by Amazon.ae. By assigning a product with a browse node, assign it to a\nshelf within Amazon\u2019s virtual warehouse, thus allowing potential customers to find the\nproduct. Based on the given classification, the web site\u2019s \u201cbrowse\u201d section will then\nfilter the respective search results.\nIn order to classify your products, please proceed with the following steps:\n1. Download the Browse Tree Guide file. The file can be found in SellerCentral help:\nManage Inventory \uf0e0 Reference \uf0e0 Browse Tree Guides\n(https://sellercentral-\neurope.amazon.com/gp/help/help.html/ref=sc_hp_1661?ie=UTF8&itemID=1661&lan\nguage=en%5FGB)\n2. Identify the most appropriate bread crumb trail (e.g.: Pet Supplies \uf0e0 Dogs \uf0e0Toy\n\uf0e0Chew Toys). Do not use the browse node entries highlighted in grey color (top-\nlevel entries) as these are only included for navigational purposes.\n3. Assign the associated Browse Node Id to the item in your feed (column\n\u201crecommended-browse-node1\u201d).\nYou can assign up to two different browse nodes per product, thus allowing you to list\nthe product in two different product categories.\nNote: If you do not provide at least one Recommended Browse Node your\nitems will not be discoverable on Amazon.ae. Populate at least the column named\nrecommended-browse-node1.\nBrowse & Search\nCustomers come to Amazon.ae to shop for products. They can find your products in two ways: either\nusing the browse option, or through search terms. Most often customers use a combination of browse and\nsearch. Make sure customers can find your products either way. Drive traffic by providing relevant search\nterms and specifying the correct browse node.\nSearch\nSearch terms help customers find your products. Your product titles and company name are already\nsearchable, so think about other words that describe your product. Think like Amazon customers\nwhen choosing your terms to ensure they can easily find your products; use words they might enter\ninto the search bar, including synonyms.\nGuidelines for listing your search terms\nEach product can have up to five search lines of 50 characters per field; that's 250\ncharacters available for your search terms\nThe words you choose are the terms our search engine uses when customers search\nthe site\nThe individual words of the title, seller, and brand are automatically included as\nsearch terms and do not need to add them to the keyword field\nAny combination of title words and search terms are fully searchable\nExamples\nText\u2013file feed\nThink like your customer\nIf you are using an inventory text file, the template fields for search terms appear as search-terms1,\nsearch-terms2, and so on.\nHere are some tips for optimizing your search terms:\nUse detailed product names - Each individual word in the Product Name is searchable by itself. Having\ndetailed product names helps ensure that your product appears in the search results. For example,\nsuppose your product name is \"Allison's Gourmet Organic Chocolate Chip Pecan Cookies - One Dozen.\"\nBecause this product name is very detailed, this product already has a good selection of search terms\neven before you add the additional terms.\nAdd as much information to your product name as you can that comprises the following:\no\nBrand and product description (for example, a luxurious dog bed or Wahl Smartgroom dog\nclaw clipper guillotine style stainless steel)\no\nProduct line (for example, Smartgroom or Happy Pet)\no\nMaterial (for example, stainless steel, carbon or plastic)\no\nColour (for example, yellow or red)\no\nSize\no\nQuantity\nUse terms once - Because the words of the product name are already searchable, do not use search\nterms that are words also contained in the title. For example, the complete list of automatic search\nterms for stainless steel claw clipper guillotine pet groomers is groomer, stainless steel, clipper,\nguillotine and pet. Good search terms for stainless steel claw clipper guillotine pet groomers,\ntherefore, might be \"dog,\" \"cat,\" and \"nails.\"\nUse single words - Single words work better as search terms than phrases. If you use phrases, then\ncustomers must type each entry exactly as you entered it. For example, if you enter \"dog nails\" as\nsearch terms for stainless steel claw clipper guillotine pet groomers, then that is what customers must\ntype. If they type \"dog\" or \"nails,\" your products won't appear in the search results. However, by\nlisting these terms separately, you allow for more combinations, such as long dog nails, sharp dog\nnails, big dog nails, small dog nails. If you aren't getting the sales you expect, continue to experiment\nwith your search terms until you find you have the best combination of product title and search terms\nfor your products.\nYou can find more details on how to create effective search terms SellerCentral help:  Increase\nSales -> Getting Started -> Using Search & Browse.\nAdd a Product in Seller Central\nSearch Refinement through Refinements (attributes such as PetType)\nRefinements are an additional way to search on top of Browse Nodes and are at least as\nimportant. Customers can use refinements to find the products with specific attributes\nfaster within a Browse Node. For example, if customers are interested in products for cats,\nthey could use refinements to filter products that did not meet these requirements. Your\nproduct would appear if you entered \u201cCat\u201cin the \u201cpet-type\u201d column.\nRecommended Browse node\nCorrect browse node assignment is key to optimizing search refinements on site.\nThe most appropriate browse term must be incorporated to help the customer drill down on the\nbrowse option to get to your product.\n1) Identify the most appropriate bread crumb trail (for example: Oils, Vinegars & Salad\nDressings/Mayonnaise). Please be precise as possible.\n2) Next assign the associated browse node ID to the item in the feed.\nNote: If you do not provide at least one recommended browse node your items will not be\ndiscoverable on Amazon.ae. You can find a list of recommended browse nodes from seller central.\n```\n\nIdentify every enforceable content rule described in this section and output them using the required JSON schema.\n",
+    "response": "[\n  {\n    \"id\": \"desc-max-length\",\n    \"section\": \"description\",\n    \"type\": \"max_length\",\n    \"params\": {\n      \"value\": 200\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product description must not exceed 200 characters.\",\n    \"citation\": \"Product descriptions are limited to 200 characters.\"\n  },\n  {\n    \"id\": \"desc-no-urls-emails\",\n    \"section\": \"description\",\n    \"type\": \"no_urls_emails\",\n    \"params\": {},\n    \"severity\": \"error\",\n    \"message\": \"Product description must not include email addresses or website URLs.\",\n    \"citation\": \"Do not include your seller name, e-mail address, website URL, or any company-specific information\"\n  },\n  {\n    \"id\": \"desc-no-promo-language\",\n    \"section\": \"description\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"\\\\b(sale|free\\\\s+(shipping|delivery))\\\\b\",\n      \"flags\": \"i\"\n    },\n    \"severity\": \"error\",\n    \"message\": \"Product description must not include promotional language such as 'sale' or 'free shipping/delivery'.\",\n    \"citation\": \"Do not include promotional language such as 'sale' or 'free shipping/delivery'\"\n  },\n  {\n    \"id\": \"desc-no-all-caps\",\n    \"section\": \"description\",\n    \"type\": \"forbidden_regex\",\n    \"params\": {\n      \"pattern\": \"^[^a-z]*$\"\n    },\n    \"severity\": \"warning\",\n    \"message\": \"Product description should not be written entirely in capital letters; use sentence capitalization.\",\n    \"citation\": \"Do not write in capitals; your product description should be written in sentence caps\"\n  }\n]",
+    "parsed": [
+      {
+        "id": "desc-max-length",
+        "section": "description",
+        "type": "max_length",
+        "params": {
+          "value": 200
+        },
+        "severity": "error",
+        "message": "Product description must not exceed 200 characters.",
+        "citation": "Product descriptions are limited to 200 characters."
+      },
+      {
+        "id": "desc-no-urls-emails",
+        "section": "description",
+        "type": "no_urls_emails",
+        "params": {},
+        "severity": "error",
+        "message": "Product description must not include email addresses or website URLs.",
+        "citation": "Do not include your seller name, e-mail address, website URL, or any company-specific information"
+      },
+      {
+        "id": "desc-no-promo-language",
+        "section": "description",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "\\b(sale|free\\s+(shipping|delivery))\\b",
+          "flags": "i"
+        },
+        "severity": "error",
+        "message": "Product description must not include promotional language such as 'sale' or 'free shipping/delivery'.",
+        "citation": "Do not include promotional language such as 'sale' or 'free shipping/delivery'"
+      },
+      {
+        "id": "desc-no-all-caps",
+        "section": "description",
+        "type": "forbidden_regex",
+        "params": {
+          "pattern": "^[^a-z]*$"
+        },
+        "severity": "warning",
+        "message": "Product description should not be written entirely in capital letters; use sentence capitalization.",
+        "citation": "Do not write in capitals; your product description should be written in sentence caps"
+      }
+    ]
+  }
+}

@@ -4,51 +4,188 @@ meta:
   categories:
   - PetSupplies
 rules:
-- id: BULLETS_MAX5
-  section: bullets
-  type: max_count
+- id: title-max-length
+  section: title
+  type: max_length
   params:
-    value: 5
+    value: 50
   severity: error
-  message: Use up to 5 bullet points.
-  citation: "Policy: Key Product Features \u2014 up to five features."
+  message: Product title must not exceed 50 characters.
+  citation: 50 characters maximum
   scope:
     market:
     - AE
     categories:
     - PetSupplies
-- id: BULLETS_NO_END_PUNCT
+- id: title-forbidden-symbols
+  section: title
+  type: forbidden_regex
+  params:
+    pattern: "[\xAE\xA9\u2122!*$?]"
+  severity: error
+  message: "Product title must not contain special characters such as \xAE, \xA9,\
+    \ \u2122, !, *, $, or ?. Include only standard text."
+  citation: 'Note: Please include only standard text...; Do not include symbols...'
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: title-forbidden-all-caps
+  section: title
+  type: forbidden_regex
+  params:
+    pattern: \b[A-Z]{2,}\b
+  severity: error
+  message: Product title must not use ALL CAPS for words.
+  citation: Do not use ALL CAPS
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: title-forbidden-capitalized-small-words
+  section: title
+  type: forbidden_regex
+  params:
+    pattern: \b(And|Or|For|The|A|An|In|On|Over|With)\b
+  severity: warning
+  message: Specific small words (conjunctions, articles, short prepositions) must
+    not be capitalized in the title.
+  citation: 'Do not capitalise:'
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: title-forbidden-spelled-out-numbers
+  section: title
+  type: forbidden_regex
+  params:
+    pattern: \b(one|two|three|four|five|six|seven|eight|nine|ten)\b
+  severity: warning
+  message: Numbers should be represented as numerals (e.g., 2 instead of two).
+  citation: Use numerals (2 instead of two)
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: title-forbidden-price
+  section: title
+  type: forbidden_regex
+  params:
+    pattern: "(\\$|\xA3|\u20AC|\xA5|\\b(USD|GBP|EUR|CAD|AUD)\\b)\\s*\\d+(\\.\\d{1,2})?"
+  severity: error
+  message: Product title must not include price information.
+  citation: Do not include price and quantity
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: title-forbidden-promotional
+  section: title
+  type: forbidden_regex
+  params:
+    pattern: \b(sale|free shipping|free delivery|discount|promo|deal|offer)\b
+  severity: error
+  message: Product title must not include promotional messages.
+  citation: Do not include promotional messages
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: title-forbidden-subjective
+  section: title
+  type: forbidden_regex
+  params:
+    pattern: \b(Hot Item|Best Seller|Amazing|Great Value|New Arrival|Limited Edition)\b
+  severity: error
+  message: Product title must not include subjective commentary.
+  citation: Do not include subjective commentary
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: bullets_no_ending_punct
   section: bullets
   type: no_ending_punct
-  params:
-    punctuation: .;:!
-  severity: warning
-  message: Bullets should not end with punctuation.
-  citation: "Policy: Key Product Features \u2014 sentence fragments."
-  scope:
-    market:
-    - AE
-    categories:
-    - PetSupplies
-- id: BULLETS_CAP_START
-  section: bullets
-  type: bullets_capitalized
   params: {}
-  severity: warning
-  message: Bullets must begin with a capital letter.
-  citation: "Policy: Key Product Features \u2014 start each bullet with a capital letter."
+  severity: error
+  message: Bullet points must not include ending punctuation.
+  citation: do not include ending punctuation
   scope:
     market:
     - AE
     categories:
     - PetSupplies
-- id: BULLETS_NUMERALS
+- id: bullets_numbers_as_numerals
   section: bullets
   type: bullets_numbers_as_numerals
   params: {}
+  severity: error
+  message: All numbers in bullet points should be written as numerals (e.g., '5' instead
+    of 'five').
+  citation: Write all numbers as numerals
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: desc-max-length
+  section: description
+  type: max_length
+  params:
+    value: 200
+  severity: error
+  message: Product description must not exceed 200 characters.
+  citation: Product descriptions are limited to 200 characters.
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: desc-no-urls-emails
+  section: description
+  type: no_urls_emails
+  params: {}
+  severity: error
+  message: Product description must not include email addresses or website URLs.
+  citation: Do not include your seller name, e-mail address, website URL, or any company-specific
+    information
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: desc-no-promo-language
+  section: description
+  type: forbidden_regex
+  params:
+    pattern: \b(sale|free\s+(shipping|delivery))\b
+    flags: i
+  severity: error
+  message: Product description must not include promotional language such as 'sale'
+    or 'free shipping/delivery'.
+  citation: Do not include promotional language such as 'sale' or 'free shipping/delivery'
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: desc-no-all-caps
+  section: description
+  type: forbidden_regex
+  params:
+    pattern: ^[^a-z]*$
   severity: warning
-  message: All numbers in bullets should be expressed as numerals.
-  citation: "Policy: Key Product Features \u2014 write numbers as numerals."
+  message: Product description should not be written entirely in capital letters;
+    use sentence capitalization.
+  citation: Do not write in capitals; your product description should be written in
+    sentence caps
   scope:
     market:
     - AE

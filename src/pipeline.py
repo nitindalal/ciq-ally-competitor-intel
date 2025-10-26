@@ -28,7 +28,13 @@ def _coerce_list(value):
     if value is None:
         return []
     if isinstance(value, list):
-        return [str(x).strip() for x in value if str(x).strip()]
+        cleaned = []
+        for item in value:
+            text = str(item).strip()
+            text = text.lstrip("-• \t")
+            if text:
+                cleaned.append(text)
+        return cleaned
     if isinstance(value, str):
         parts = [p.strip("- ").strip() for p in value.splitlines() if p.strip()]
         return parts if len(parts) > 1 else [value.strip()]

@@ -29,6 +29,12 @@ python3 -m eval.run_eval --case foo # run a single case
 python3 -m eval.run_eval --verbose  # include diagnostics per case
 ```
 
+### Regenerate Policy Rules (Optional)
+```bash
+python3 -m src.policy_llm_extract --pdf data/policies/pet-supplies_ae_2018/source.pdf \
+    --out data/policies/pet-supplies_ae_2018/rules.yaml --dump-dir eval/generated_rules
+```
+
 ### Run API
 ```bash
 uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
