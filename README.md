@@ -22,6 +22,13 @@ python -m src.main --client_id <CLIENT_SKU_ID> --competitor_id <COMP_SKU_ID> --c
 streamlit run src/app_streamlit.py
 ```
 
+### Run Eval Set (Optional)
+```bash
+python3 -m eval.run_eval            # run every case in eval/cases
+python3 -m eval.run_eval --case foo # run a single case
+python3 -m eval.run_eval --verbose  # include diagnostics per case
+```
+
 ### Run API
 ```bash
 uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload

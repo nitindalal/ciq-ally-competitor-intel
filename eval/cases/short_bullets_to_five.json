@@ -1,0 +1,16 @@
+{
+  "name": "short_bullets_to_five",
+  "client_id": "B0D6N5FZ29",
+  "competitor_id": "B0BGR4FTZS",
+  "csv_path": "data/asin_data_filled.csv",
+  "market": "AE",
+  "expectations": {
+    "min_suggestions": 1,
+    "required_sections": ["bullets"],
+    "require_references": true,
+    "draft": {
+      "bullets_min_count": 3,
+      "bullets_max_count": 5
+    }
+  }
+}

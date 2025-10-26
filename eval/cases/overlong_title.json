@@ -1,0 +1,16 @@
+{
+  "name": "overlong_title",
+  "client_id": "B0D8WP5BFG",
+  "competitor_id": "B0BGR4FTZS",
+  "csv_path": "data/asin_data_filled.csv",
+  "market": "AE",
+  "expectations": {
+    "min_suggestions": 3,
+    "required_sections": ["title", "bullets"],
+    "require_references": true,
+    "draft": {
+      "title_max_length": 200,
+      "bullets_max_count": 5
+    }
+  }
+}

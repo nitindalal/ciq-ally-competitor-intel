@@ -1,0 +1,13 @@
+{
+  "name": "repetitive_description",
+  "client_id": "B0BPN423GH",
+  "competitor_id": "B0BGR4FTZS",
+  "csv_path": "data/asin_data_filled.csv",
+  "market": "AE",
+  "expectations": {
+    "min_suggestions": 2,
+    "required_sections": ["description", "bullets"],
+    "require_references": true,
+    "require_changed_sections": ["description"]
+  }
+}
