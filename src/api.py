@@ -5,9 +5,8 @@ from typing import Any, Dict, List, Optional, Union
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-import aiosmtplib
+import httpx
 import markdown2
-from email.message import EmailMessage
 import os
 
 from .skill import run_compare, _coerce_list
@@ -226,12 +225,18 @@ def compare(req: CompareRequest) -> CompareResponse:
     }
     suggestions = [_serialize_suggestion(s) for s in result.get("suggestions", [])]
 
+    report_markdown = result.get("report_markdown", "") if req.include_report else ""
+    draft_payload = DraftDTO(**result.get("draft", {})) if req.include_draft else DraftDTO(title="", bullets=[], description="")
+    suggestions_payload = suggestions if req.include_suggestions else []
+    findings_payload = findings if req.include_findings else {"client": [], "competitor": []}
+    comparison_payload = [_serialize_comparison(row) for row in result.get("comparison", [])] if req.include_comparison else []
+
     response = CompareResponse(
-        report_markdown=result.get("report_markdown", ""),
-        draft=DraftDTO(**result.get("draft", {})),
-        suggestions=suggestions,
-        findings=findings,
-        comparison=[_serialize_comparison(row) for row in result.get("comparison", [])],
+        report_markdown=report_markdown,
+        draft=draft_payload,
+        suggestions=suggestions_payload,
+        findings=findings_payload,
+        comparison=comparison_payload,
         client=_serialize_sku(result.get("client")),
         competitor=_serialize_sku(result.get("competitor")),
     )
@@ -273,28 +278,35 @@ def finalize(req: FinalizeRequest) -> FinalizeResponse:
 
 @app.post("/email", response_model=EmailResponse)
 async def send_email(req: EmailRequest) -> EmailResponse:
-    cfg = _smtp_config()
+    cfg = _mailjet_config()
     if not cfg:
-        raise HTTPException(status_code=500, detail="SMTP settings not configured")
+        raise HTTPException(status_code=500, detail="Mailjet settings not configured")
 
-    html_body = markdown2.markdown(req.body_markdown)
-    msg = EmailMessage()
-    msg["Subject"] = req.subject
-    msg["From"] = req.from_email or cfg["from_email"]
-    msg["To"] = req.to_email
-    msg.set_content(req.body_markdown)
-    msg.add_alternative(html_body, subtype="html")
+    html_body = markdown2.markdown(req.body_markdown or "")
+    from_email = req.from_email or cfg["from_email"]
+    from_name = cfg.get("from_name") or "CIQ Ally"
+
+    payload = {
+        "Messages": [
+            {
+                "From": {"Email": from_email, "Name": from_name},
+                "To": [{"Email": req.to_email}],
+                "Subject": req.subject,
+                "TextPart": req.body_markdown,
+                "HTMLPart": html_body,
+            }
+        ]
+    }
 
     try:
-        await aiosmtplib.send(
-            msg,
-            hostname=cfg["host"],
-            port=cfg["port"],
-            start_tls=cfg["start_tls"],
-            use_tls=cfg["use_tls"],
-            username=cfg["username"],
-            password=cfg["password"],
-        )
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                "https://api.mailjet.com/v3.1/send",
+                json=payload,
+                auth=(cfg["api_key"], cfg["secret_key"]),
+            )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=500, detail=resp.text)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
@@ -342,23 +354,17 @@ def _render_final_markdown(sku_id: str, draft: DraftDTO) -> str:
     return "\n".join(lines)
 
 
-def _smtp_config() -> Optional[Dict[str, Any]]:
-    host = os.getenv("MAILJET_SMTP_HOST", "in-v3.mailjet.com")
-    port = int(os.getenv("MAILJET_SMTP_PORT", "465"))
-    use_tls = os.getenv("MAILJET_USE_TLS", "true").lower() == "true"
-    start_tls = os.getenv("MAILJET_START_TLS", "false").lower() == "true"
-    username = os.getenv("MAILJET_API_KEY")
-    password = os.getenv("MAILJET_SECRET_KEY")
+def _mailjet_config() -> Optional[Dict[str, Any]]:
+    api_key = os.getenv("MAILJET_API_KEY")
+    secret_key = os.getenv("MAILJET_SECRET_KEY")
     from_email = os.getenv("MAILJET_FROM_EMAIL")
+    from_name = os.getenv("MAILJET_FROM_NAME")
 
-    if not (username and password and from_email):
+    if not (api_key and secret_key and from_email):
         return None
     return {
-        "host": host,
-        "port": port,
-        "username": username,
-        "password": password,
+        "api_key": api_key,
+        "secret_key": secret_key,
         "from_email": from_email,
-        "use_tls": use_tls,
-        "start_tls": start_tls,
+        "from_name": from_name,
     }

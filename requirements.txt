@@ -11,5 +11,5 @@ pydantic
 google-generativeai
 pyyaml
 pymupdf
-aiosmtplib
 markdown2
+httpx
