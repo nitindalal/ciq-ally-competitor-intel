@@ -26,6 +26,11 @@ class CompareRequest(BaseModel):
     competitor_id: str = Field(..., description="Competitor SKU identifier.")
     market: str = Field(default="AE", description="Market code to filter policy packs.")
     csv_path: str = Field(default="data/asin_data_filled.csv", description="Path to the catalog CSV.")
+    include_report: bool = Field(default=True, description="Include rendered markdown report.")
+    include_comparison: bool = Field(default=True, description="Include comparison table.")
+    include_findings: bool = Field(default=True, description="Include policy findings.")
+    include_suggestions: bool = Field(default=True, description="Include suggestion list.")
+    include_draft: bool = Field(default=True, description="Include draft title/bullets/description.")
 
 
 class DraftDTO(BaseModel):
@@ -120,6 +125,23 @@ class EmailRequest(BaseModel):
 
 class EmailResponse(BaseModel):
     status: str
+
+
+class EvalRequest(BaseModel):
+    case: Optional[str] = Field(default=None, description="Optional case name to run (without .json). Run all cases if omitted.")
+    verbose: bool = Field(default=False, description="Include debug information for each case.")
+
+
+class EvalCaseResult(BaseModel):
+    name: str
+    passed: bool
+    errors: List[str] = []
+    info: Dict[str, Any] = {}
+
+
+class EvalResponse(BaseModel):
+    overall_pass: bool
+    results: List[EvalCaseResult]
 
 
 # ---------- Serialization helpers ----------
@@ -398,18 +420,3 @@ def _mailjet_config() -> Optional[Dict[str, Any]]:
         "from_email": from_email,
         "from_name": from_name,
     }
-class EvalRequest(BaseModel):
-    case: Optional[str] = Field(default=None, description="Optional case name to run (without .json). Run all cases if omitted.")
-    verbose: bool = Field(default=False, description="Include debug information for each case.")
-
-
-class EvalCaseResult(BaseModel):
-    name: str
-    passed: bool
-    errors: List[str] = []
-    info: Dict[str, Any] = {}
-
-
-class EvalResponse(BaseModel):
-    overall_pass: bool
-    results: List[EvalCaseResult]

@@ -42,6 +42,7 @@ uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 ```
 - `POST /compare` → full pipeline (report + draft + suggestions)  
   optional flags: `include_report`, `include_comparison`, `include_findings`, `include_suggestions`, `include_draft`
+  optional flags: `include_report`, `include_comparison`, `include_findings`, `include_suggestions`, `include_draft`
 - `POST /validate` → re-check a draft `{client_id, draft{title,bullets,description}}` against policy
 - `POST /finalize` → return final markdown plus validation findings for the supplied draft
 - `POST /email` → send markdown via Mailjet (`MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `MAILJET_FROM_EMAIL`, optional `MAILJET_FROM_NAME`)
