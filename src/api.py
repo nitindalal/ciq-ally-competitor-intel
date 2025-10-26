@@ -5,6 +5,10 @@ from typing import Any, Dict, List, Optional, Union
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+import aiosmtplib
+import markdown2
+from email.message import EmailMessage
+import os
 
 from .skill import run_compare, _coerce_list
 from .loaders import load_csv, select_skus
@@ -105,6 +109,17 @@ class FinalizeResponse(BaseModel):
     final_markdown: str
     draft: DraftDTO
     findings: List[FindingDTO] = []
+
+
+class EmailRequest(BaseModel):
+    to_email: str = Field(..., description="Recipient email address.")
+    subject: str = Field(default="CIQ Ally Draft", description="Email subject line.")
+    from_email: Optional[str] = Field(default=None, description="Sender email override.")
+    body_markdown: str = Field(..., description="Markdown content to send.")
+
+
+class EmailResponse(BaseModel):
+    status: str
 
 
 # ---------- Serialization helpers ----------
@@ -256,6 +271,35 @@ def finalize(req: FinalizeRequest) -> FinalizeResponse:
     return FinalizeResponse(final_markdown=final_markdown, draft=draft, findings=serialized)
 
 
+@app.post("/email", response_model=EmailResponse)
+async def send_email(req: EmailRequest) -> EmailResponse:
+    cfg = _smtp_config()
+    if not cfg:
+        raise HTTPException(status_code=500, detail="SMTP settings not configured")
+
+    html_body = markdown2.markdown(req.body_markdown)
+    msg = EmailMessage()
+    msg["Subject"] = req.subject
+    msg["From"] = req.from_email or cfg["from_email"]
+    msg["To"] = req.to_email
+    msg.set_content(req.body_markdown)
+    msg.add_alternative(html_body, subtype="html")
+
+    try:
+        await aiosmtplib.send(
+            msg,
+            hostname=cfg["host"],
+            port=cfg["port"],
+            start_tls=True,
+            username=cfg["username"],
+            password=cfg["password"],
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    return EmailResponse(status="sent")
+
+
 def _load_client(client_id: str, csv_path: str):
     df = load_csv(csv_path)
     client_row, _ = select_skus(df, client_id, client_id)
@@ -295,3 +339,21 @@ def _render_final_markdown(sku_id: str, draft: DraftDTO) -> str:
         ]
     )
     return "\n".join(lines)
+
+
+def _smtp_config() -> Optional[Dict[str, Any]]:
+    host = os.getenv("MAILJET_SMTP_HOST", "in-v3.mailjet.com")
+    port = int(os.getenv("MAILJET_SMTP_PORT", "587"))
+    username = os.getenv("MAILJET_API_KEY")
+    password = os.getenv("MAILJET_SECRET_KEY")
+    from_email = os.getenv("MAILJET_FROM_EMAIL")
+
+    if not (username and password and from_email):
+        return None
+    return {
+        "host": host,
+        "port": port,
+        "username": username,
+        "password": password,
+        "from_email": from_email,
+    }

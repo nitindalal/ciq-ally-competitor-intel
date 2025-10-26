@@ -43,6 +43,7 @@ uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 - `POST /compare` → full pipeline (report + draft + suggestions)
 - `POST /validate` → re-check a draft `{client_id, draft{title,bullets,description}}` against policy
 - `POST /finalize` → return final markdown plus validation findings for the supplied draft
+- `POST /email` → send markdown via Mailjet SMTP (configure `MAILJET_*` env vars first)
 
 ### Wire Into a Custom GPT (Optional)
 1. **Deploy the API** somewhere reachable over HTTPS (same FastAPI app above; Render/Fly/Railway works).
