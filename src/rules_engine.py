@@ -73,6 +73,44 @@ def check_no_urls_emails(value: Any, _params: Dict[str, Any]) -> bool:
     if not isinstance(value, str): return True
     return not re.search(r"(https?://|www\.|\S+@\S+)", value, re.I)
 
+def check_bullets_capitalized(value: Any, _params: Dict[str, Any]) -> bool:
+    """
+    Ensure each bullet starts with a capital letter once leading punctuation/whitespace is stripped.
+    """
+    if not isinstance(value, list): return True
+    for raw in value:
+        if not raw:
+            continue
+        text = str(raw).lstrip("-• \t")
+        for ch in text:
+            if ch.isalpha():
+                if not ch.isupper():
+                    return False
+                break
+        else:
+            # No alphabetic character found; treat as pass
+            continue
+    return True
+
+_NUMBER_WORDS = {
+    "zero", "one", "two", "three", "four", "five",
+    "six", "seven", "eight", "nine", "ten", "eleven",
+    "twelve"
+}
+
+def check_bullets_numbers_as_numerals(value: Any, _params: Dict[str, Any]) -> bool:
+    """
+    Fail if a bullet spells out numbers (e.g., 'five') instead of using numerals.
+    """
+    if not isinstance(value, list): return True
+    for raw in value:
+        if not raw:
+            continue
+        text = str(raw).lower()
+        if any(f" {word} " in f" {text} " for word in _NUMBER_WORDS):
+            return False
+    return True
+
 def check_image_constraint(value: Any, params: Dict[str, Any]) -> bool:
     """
     Placeholder: without downloading/analyzing the image we return True.
@@ -91,6 +129,8 @@ CHECKS: Dict[str, Callable[[Any, Dict[str, Any]], bool]] = {
     "forbidden_regex_each": check_forbidden_regex_each,
     "no_ending_punct": check_no_ending_punct,
     "no_urls_emails": check_no_urls_emails,
+    "bullets_capitalized": check_bullets_capitalized,
+    "bullets_numbers_as_numerals": check_bullets_numbers_as_numerals,
     "image_constraint": check_image_constraint,
 }
 

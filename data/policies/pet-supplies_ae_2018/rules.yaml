@@ -30,3 +30,27 @@ rules:
     - AE
     categories:
     - PetSupplies
+- id: BULLETS_CAP_START
+  section: bullets
+  type: bullets_capitalized
+  params: {}
+  severity: warning
+  message: Bullets must begin with a capital letter.
+  citation: "Policy: Key Product Features \u2014 start each bullet with a capital letter."
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
+- id: BULLETS_NUMERALS
+  section: bullets
+  type: bullets_numbers_as_numerals
+  params: {}
+  severity: warning
+  message: All numbers in bullets should be expressed as numerals.
+  citation: "Policy: Key Product Features \u2014 write numbers as numerals."
+  scope:
+    market:
+    - AE
+    categories:
+    - PetSupplies
