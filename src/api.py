@@ -80,7 +80,10 @@ def _serialize_finding(finding: Any) -> FindingDTO:
     elif hasattr(finding, "__dict__"):
         data = finding.__dict__
     else:
-        data = dict(finding)
+        try:
+            data = dict(finding)
+        except TypeError:
+            raise TypeError(f"Unsupported finding type: {type(finding)!r}")
 
     severity = getattr(finding, "severity", data.get("severity"))
     payload = {
@@ -95,7 +98,15 @@ def _serialize_finding(finding: Any) -> FindingDTO:
 
 
 def _serialize_comparison(row: Any) -> ComparisonRowDTO:
-    data = getattr(row, "__dict__", dict(row))
+    if is_dataclass(row):
+        data = asdict(row)
+    elif hasattr(row, "__dict__"):
+        data = row.__dict__
+    else:
+        try:
+            data = dict(row)
+        except TypeError:
+            raise TypeError(f"Unsupported comparison row type: {type(row)!r}")
     return ComparisonRowDTO(
         section=data.get("section"),
         metric=data.get("metric"),
@@ -107,7 +118,15 @@ def _serialize_comparison(row: Any) -> ComparisonRowDTO:
 
 
 def _serialize_sku(sku: Any) -> SKUDetailsDTO:
-    data = getattr(sku, "__dict__", dict(sku))
+    if is_dataclass(sku):
+        data = asdict(sku)
+    elif hasattr(sku, "__dict__"):
+        data = sku.__dict__
+    else:
+        try:
+            data = dict(sku)
+        except TypeError:
+            raise TypeError(f"Unsupported SKU type: {type(sku)!r}")
     return SKUDetailsDTO(
         sku_id=data.get("sku_id", ""),
         title=data.get("title", ""),
