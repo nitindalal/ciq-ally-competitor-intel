@@ -290,7 +290,8 @@ async def send_email(req: EmailRequest) -> EmailResponse:
             msg,
             hostname=cfg["host"],
             port=cfg["port"],
-            start_tls=True,
+            start_tls=cfg["start_tls"],
+            use_tls=cfg["use_tls"],
             username=cfg["username"],
             password=cfg["password"],
         )
@@ -343,7 +344,9 @@ def _render_final_markdown(sku_id: str, draft: DraftDTO) -> str:
 
 def _smtp_config() -> Optional[Dict[str, Any]]:
     host = os.getenv("MAILJET_SMTP_HOST", "in-v3.mailjet.com")
-    port = int(os.getenv("MAILJET_SMTP_PORT", "587"))
+    port = int(os.getenv("MAILJET_SMTP_PORT", "465"))
+    use_tls = os.getenv("MAILJET_USE_TLS", "true").lower() == "true"
+    start_tls = os.getenv("MAILJET_START_TLS", "false").lower() == "true"
     username = os.getenv("MAILJET_API_KEY")
     password = os.getenv("MAILJET_SECRET_KEY")
     from_email = os.getenv("MAILJET_FROM_EMAIL")
@@ -356,4 +359,6 @@ def _smtp_config() -> Optional[Dict[str, Any]]:
         "username": username,
         "password": password,
         "from_email": from_email,
+        "use_tls": use_tls,
+        "start_tls": start_tls,
     }
