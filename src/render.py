@@ -33,6 +33,31 @@ def render_markdown_report(
     lines.append("## Summary")
     lines.append("Compared title, bullets, and description; flagged compliance gaps.\n")
 
+    # Snapshot of raw listing values to confirm correct products
+    def _cell(value):
+        text = (value or "").strip() if isinstance(value, str) else str(value or "")
+        if not text:
+            text = "(empty)"
+        return text.replace("|", "\\|").replace("\n", "<br>")
+
+    def _join_bullets(items):
+        if not items:
+            return "(none)"
+        joined = "<br>".join(f"{idx+1}. {item}" for idx, item in enumerate(items))
+        return _cell(joined)
+
+    lines.append("## Listing Snapshot")
+    lines.append("| Field | Client | Competitor |")
+    lines.append("|---|---|---|")
+    lines.append(f"| SKU | {_cell(client.sku_id)} | {_cell(competitor.sku_id)} |")
+    lines.append(f"| Title | {_cell(client.title)} | {_cell(competitor.title)} |")
+    lines.append(f"| Brand | {_cell(getattr(client, 'brand', '') or '(unknown)')} | {_cell(getattr(competitor, 'brand', '') or '(unknown)')} |")
+    lines.append(f"| Category | {_cell(getattr(client, 'category', '') or '(unknown)')} | {_cell(getattr(competitor, 'category', '') or '(unknown)')} |")
+    lines.append(f"| Bullet Count | {_cell(len(client.bullets or []))} | {_cell(len(competitor.bullets or []))} |")
+    lines.append(f"| Bullets | {_join_bullets(client.bullets or [])} | {_join_bullets(competitor.bullets or [])} |")
+    lines.append(f"| Description | {_cell(client.description)} | {_cell(competitor.description)} |")
+    lines.append("")
+
     # Comparison table
     lines.append("## Comparison Table")
     lines.append("| Section | Metric | Client | Competitor | Gap |")
